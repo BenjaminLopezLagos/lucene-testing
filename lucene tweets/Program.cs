@@ -15,7 +15,7 @@ using Lucene.Net.QueryParsers.Classic;
 using Lucene.Net.QueryParsers.Flexible.Standard;
 
 Console.WriteLine("Hello, World!");
-var DF = DataFrame.LoadCsv("..\\..\\..\\tweets.csv");
+var DF = DataFrame.LoadCsv("..\\..\\..\\chiletweets.csv");
 // Specify the compatibility version we want
 const LuceneVersion luceneVersion = LuceneVersion.LUCENE_48;
 
@@ -52,7 +52,7 @@ TopDocs topDocs = searcher.Search(query, n: 2);         //indicate we want the f
 */
 
 var qParser = new StandardQueryParser();
-Query query = qParser.Parse("+like -og", "content");
+Query query = qParser.Parse("+partido", "content");
 TopDocs topDocs = searcher.Search(query, n: 2);         //indicate we want the first 2 results
 
 Document resultDoc = searcher.Doc(topDocs.ScoreDocs[0].Doc);  //read back first doc from results (ie 0 offset)
