@@ -1,11 +1,9 @@
 ﻿using Lucene.Net.Analysis;
-using Lucene.Net.Analysis.Standard;
 using Lucene.Net.Documents;
 using Lucene.Net.Index;
 using Lucene.Net.Index.Extensions;
 using Lucene.Net.Store;
 using Lucene.Net.Util;
-using Lucene.Net.Util.Packed;
 using Microsoft.Data.Analysis;
 using LuceneDirectory = Lucene.Net.Store.Directory;
 
@@ -19,8 +17,8 @@ public class TweetIndexer
     {
         string indexPath = Path.Combine(Environment.CurrentDirectory, indexName);
         IndexDirectory = FSDirectory.Open(indexPath);
-        IndexWriterConfig indexConfig = new IndexWriterConfig(luceneVersion, analyzer);
-        indexConfig.SetOpenMode(OpenMode.CREATE_OR_APPEND);
+        var indexConfig = new IndexWriterConfig(luceneVersion, analyzer);
+        indexConfig.SetOpenMode(OpenMode.CREATE);
         IndexWriter = new IndexWriter(IndexDirectory, indexConfig);
     }
 
@@ -34,7 +32,7 @@ public class TweetIndexer
         //Add documents to the index
         foreach(var row in df.Rows)
         {
-            Document doc = new Document
+            var doc = new Document
             {
                 new TextField("content", row[3].ToString(), Field.Store.YES),
                 new TextField("likes", row[4].ToString(), Field.Store.YES),
