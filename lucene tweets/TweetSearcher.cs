@@ -1,4 +1,5 @@
-﻿using Lucene.Net.Analysis.Standard;
+﻿using Lucene.Net.Analysis;
+using Lucene.Net.Analysis.Standard;
 using Lucene.Net.Documents;
 using Lucene.Net.Index;
 using Lucene.Net.QueryParsers.Analyzing;
@@ -51,9 +52,10 @@ public class TweetSearcher
         return docList;
     }
     
-    public IList<Document>? CustomQuery(string field, string? userQuery, int numberOfResults = 5)
+    public IList<Document>? CustomQuery(string field, string? userQuery, int numberOfResults = 5,
+        LuceneVersion luceneVersion = LuceneVersion.LUCENE_48)
     {
-        var queryParser = new AnalyzingQueryParser(LuceneVersion.LUCENE_48, field, new StandardAnalyzer(LuceneVersion.LUCENE_48));
+        var queryParser = new AnalyzingQueryParser(luceneVersion, field, new StandardAnalyzer(luceneVersion));
         var query = queryParser.Parse(query: userQuery);
         var topDocs = Searcher.Search(query, n: numberOfResults); //indicate we want the first n results
         Console.WriteLine($"Matching results: {topDocs.TotalHits}");
