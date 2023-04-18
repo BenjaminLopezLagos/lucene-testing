@@ -1,8 +1,11 @@
-﻿using Lucene.Net.Documents;
+﻿using Lucene.Net.Analysis.Standard;
+using Lucene.Net.Documents;
 using Lucene.Net.Index;
+using Lucene.Net.QueryParsers.Analyzing;
 using Lucene.Net.QueryParsers.Flexible.Standard;
 using Lucene.Net.Search;
 using Lucene.Net.Store;
+using Lucene.Net.Util;
 using Directory = Lucene.Net.Store.Directory;
 
 namespace lucene_tweets;
@@ -10,21 +13,21 @@ namespace lucene_tweets;
 public class TweetSearcher
 {
     private Directory IndexDirectory { get; }
-    public DirectoryReader Reader { get; }
+    public IndexReader IndexReader { get; }
     private IndexSearcher Searcher { get; }
 
     public TweetSearcher(string indexName)
     {
         var indexPath = Path.Combine(Environment.CurrentDirectory, indexName);
         IndexDirectory = FSDirectory.Open(indexPath);
-        Reader = DirectoryReader.Open(IndexDirectory);
-        Searcher = new IndexSearcher(Reader);
+        IndexReader = DirectoryReader.Open(IndexDirectory);
+        Searcher = new IndexSearcher(IndexReader);
     }
 
     public IList<Document>? SingleTermQuery(string field, string content, int numberOfResults = 5)
     {
         var query = new TermQuery(new Term(field, content));
-        TopDocs topDocs = Searcher.Search(query, n: numberOfResults); //indicate we want the first n results
+        var topDocs = Searcher.Search(query, n: numberOfResults); //indicate we want the first n results
         Console.WriteLine($"Matching results: {topDocs.TotalHits}");
         if (topDocs.ScoreDocs.Length < 1)
         {
@@ -48,10 +51,10 @@ public class TweetSearcher
         return docList;
     }
     
-    public IList<Document>? ComplexQuery(string field, string content, int numberOfResults = 5)
+    public IList<Document>? CustomQuery(string field, string? userQuery, int numberOfResults = 5)
     {
-        var queryParser = new StandardQueryParser();
-        var query = queryParser.Parse("+partido", "content");
+        var queryParser = new AnalyzingQueryParser(LuceneVersion.LUCENE_48, field, new StandardAnalyzer(LuceneVersion.LUCENE_48));
+        var query = queryParser.Parse(query: userQuery);
         var topDocs = Searcher.Search(query, n: numberOfResults); //indicate we want the first n results
         Console.WriteLine($"Matching results: {topDocs.TotalHits}");
         if (topDocs.ScoreDocs.Length < 1)

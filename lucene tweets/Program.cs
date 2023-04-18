@@ -10,23 +10,39 @@ using LuceneDirectory = Lucene.Net.Store.Directory;
 // Specify the compatibility version we want
 const LuceneVersion luceneVersion = LuceneVersion.LUCENE_48;
 /****** DATA ******/
-var df = DataFrame.LoadCsv("..\\..\\..\\chiletweets.csv");
+//var df1 = DataFrame.LoadCsv("..\\..\\..\\tweets.csv");
+//var df2 = DataFrame.LoadCsv("..\\..\\..\\chiletweets.csv");
 
+//var trainingDf = DataFrame.LoadCsv("..\\..\\..\\dataset\\tweet_sentiment_dataset.csv");
 //Open the Directory using a Lucene Directory class
-var indexName = "example_index";
+var indexNameTweets = "example_index";
+var indexNameTraining = "training_index";
 
 /****** INDEXER ******/
-//var indexer = new TweetIndexer(luceneVersion, indexName, new StandardAnalyzer(luceneVersion));
+var indexer = new TweetIndexer(luceneVersion, indexNameTweets, new StandardAnalyzer(luceneVersion));
+//var indexerTraining = new TweetIndexer(luceneVersion, indexNameTraining, new StandardAnalyzer(luceneVersion));
 //indexer.DeleteCurrentIndex();
-//indexer.AddTweetsToIndex(df);
+//indexer.AddTweetsToIndex(df1);
+//indexer.AddTweetsToIndex(df2);
+//indexerTraining.AddTrainingSetToIndex(df: trainingDf);
 
 /****** SEARCHER ******/
-var searcher = new TweetSearcher(indexName);
-var resultDocs = searcher.SingleTermQuery(field: "content", content:"csm", numberOfResults: 3);
-TweetSearcher.PrintResults(resultDocs);
-
+var searcher = new TweetSearcher(indexNameTweets);
+var searcherTrainingSet = new TweetSearcher(indexNameTraining);
 
 /****** CLASSIFIER ******/
-var NBC = new SimpleNaiveBayesClassifier();
-NBC.Train(SlowCompositeReaderWrapper.Wrap(searcher.Reader), textFieldName:"", classFieldName:"", new StandardAnalyzer(luceneVersion));
-ClassificationResult<BytesRef> classValue = NBC.AssignClass(resultDocs?[0].Get("content"));
+var nbc = new SimpleNaiveBayesClassifier();
+
+nbc.Train(
+    SlowCompositeReaderWrapper.Wrap(searcherTrainingSet.IndexReader), textFieldName:"content",
+    classFieldName:"target",
+    new StandardAnalyzer(luceneVersion)
+    );
+
+Console.WriteLine("write something");
+var userInput = Console.ReadLine();
+var resultDocs = searcher.CustomQuery(field: "content", userQuery: userInput, numberOfResults: 100);
+TweetSearcher.PrintResults(resultDocs);
+
+ClassificationResult<BytesRef> classValue = nbc.AssignClass(resultDocs?[0].Get("content"));
+Console.WriteLine($"{resultDocs?[0].Get("content")} \n {classValue.AssignedClass.Utf8ToString()}");

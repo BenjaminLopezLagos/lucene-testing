@@ -15,10 +15,10 @@ public class TweetIndexer
     private IndexWriter IndexWriter { get; }
     public TweetIndexer(LuceneVersion luceneVersion, string indexName, Analyzer analyzer)
     {
-        string indexPath = Path.Combine(Environment.CurrentDirectory, indexName);
+        var indexPath = Path.Combine(Environment.CurrentDirectory, indexName);
         IndexDirectory = FSDirectory.Open(indexPath);
         var indexConfig = new IndexWriterConfig(luceneVersion, analyzer);
-        indexConfig.SetOpenMode(OpenMode.CREATE);
+        indexConfig.SetOpenMode(OpenMode.CREATE_OR_APPEND);
         IndexWriter = new IndexWriter(IndexDirectory, indexConfig);
     }
 
@@ -37,7 +37,24 @@ public class TweetIndexer
                 new TextField("content", row[3].ToString(), Field.Store.YES),
                 new TextField("likes", row[4].ToString(), Field.Store.YES),
                 new TextField("rts", row[5].ToString(), Field.Store.YES),
-                new TextField("views", row[6] != null ? row[6].ToString() : "no views", Field.Store.YES)
+                new Int32Field("views", row[6] != null? Convert.ToInt32(row[6]) : 0, Field.Store.YES)
+            };
+            IndexWriter.AddDocument(doc);
+        }
+        //Flush and commit the index data to the directory
+        IndexWriter.Commit();
+    }
+    
+    public void AddTrainingSetToIndex(DataFrame df)
+    {
+        //Add documents to the index
+        foreach(var row in df.Rows)
+        {
+            var doc = new Document
+            {
+                new TextField("content", row[5].ToString(), Field.Store.YES),
+                new TextField("flag", row[3].ToString(), Field.Store.YES),
+                new TextField("target", row[0].ToString(), Field.Store.YES)
             };
             IndexWriter.AddDocument(doc);
         }
