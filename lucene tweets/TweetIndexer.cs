@@ -34,10 +34,9 @@ public class TweetIndexer
         {
             var doc = new Document
             {
-                new TextField("content", row[3].ToString(), Field.Store.YES),
-                new TextField("likes", row[4].ToString(), Field.Store.YES),
-                new TextField("rts", row[5].ToString(), Field.Store.YES),
-                new Int32Field("views", row[6] != null? Convert.ToInt32(row[6]) : 0, Field.Store.YES)
+                new TextField("user", row[0].ToString(), Field.Store.YES),
+                new TextField("content", row[1].ToString(), Field.Store.YES),
+                new TextField("date", row[2].ToString(), Field.Store.YES),
             };
             IndexWriter.AddDocument(doc);
         }

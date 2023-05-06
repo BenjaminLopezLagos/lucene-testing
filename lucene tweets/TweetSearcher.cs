@@ -52,6 +52,33 @@ public class TweetSearcher
         return docList;
     }
     
+    public IList<Document>? CustomQuery(Query userQuery, int numberOfResults = 5)
+    {
+        var topDocs = Searcher.Search(userQuery, n: numberOfResults); //indicate we want the first n results
+        Console.WriteLine($"Matching results: {topDocs.TotalHits}");
+        if (topDocs.ScoreDocs.Length < 1)
+        {
+            Console.WriteLine("No results");
+            return null;
+        }
+
+        var flag = 0;
+        var docList = new List<Document>(numberOfResults);
+        foreach (var scoreDoc in topDocs.ScoreDocs)
+        {
+            var resultDoc = Searcher.Doc(scoreDoc.Doc);
+            docList.Add(resultDoc);
+            flag++;
+            if (flag > numberOfResults)
+            {
+                break;
+            }
+        }
+
+        return docList;
+    }
+
+    /*
     public IList<Document>? CustomQuery(string field, string? userQuery, int numberOfResults = 5,
         LuceneVersion luceneVersion = LuceneVersion.LUCENE_48)
     {
@@ -80,7 +107,7 @@ public class TweetSearcher
 
         return docList;
     }
-
+*/
     public static void PrintResults(IList<Document>? documents)
     {
         if (documents == null || documents.Count < 1)
@@ -89,10 +116,9 @@ public class TweetSearcher
         }
         foreach (var doc in documents)
         {
+            Console.WriteLine($"User: {doc.Get("user")}");
             Console.WriteLine($"Content of tweet: {doc.Get("content")}");
-            Console.WriteLine($"Likes of tweet: {doc.Get("likes")}");
-            Console.WriteLine($"RTS of tweet: {doc.Get("rts")}");
-            Console.WriteLine($"Views of tweet: {doc.Get("views")}");
+            Console.WriteLine($"Tweet date: {doc.Get("date")}");
             Console.WriteLine();
         }
     }
