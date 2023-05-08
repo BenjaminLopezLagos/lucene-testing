@@ -39,13 +39,24 @@ nbc.Train(
     classFieldName:"target",
     new StandardAnalyzer(luceneVersion)
     );
-
+/*
 var query = new BooleanQuery();
 //query.Add(new TermQuery(new Term("content", "csm")), Occur.MUST);
 //query.Add(NumericRangeQuery.NewInt32Range(field:"views",min:0, max:100,true,true), Occur.MUST);
 query.Add(new WildcardQuery(new Term("content", "c*m")), Occur.MUST);
+*/
+var query = new MatchAllDocsQuery();
+
 var resultDocs = searcher.CustomQuery(query);
 TweetSearcher.PrintResults(resultDocs);
 
-ClassificationResult<BytesRef> classValue = nbc.AssignClass(resultDocs?[0].Get("content"));
-Console.WriteLine($"{resultDocs?[0].Get("content")} \n {classValue.AssignedClass.Utf8ToString()}");
+if (resultDocs != null)
+{
+    foreach (var d in resultDocs)
+    {
+        ClassificationResult<BytesRef> classValue = nbc.AssignClass(d.Get("content"));
+        var docClass = classValue.AssignedClass.Utf8ToString();
+        Console.WriteLine($"{d.Get("content")} \n {docClass}"); 
+    } 
+}
+Console.WriteLine("done");

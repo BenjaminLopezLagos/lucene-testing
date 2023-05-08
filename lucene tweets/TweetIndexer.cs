@@ -12,7 +12,7 @@ namespace lucene_tweets;
 public class TweetIndexer
 {
     private LuceneDirectory IndexDirectory { get; }
-    private IndexWriter IndexWriter { get; }
+    public IndexWriter IndexWriter { get; }
     public TweetIndexer(LuceneVersion luceneVersion, string indexName, Analyzer analyzer)
     {
         var indexPath = Path.Combine(Environment.CurrentDirectory, indexName);
@@ -32,11 +32,12 @@ public class TweetIndexer
         //Add documents to the index
         foreach(var row in df.Rows)
         {
+            var date = Helper.GetUntilOrEmpty(row[2].ToString(), " · ");
             var doc = new Document
             {
-                new TextField("user", row[0].ToString(), Field.Store.YES),
+                new StringField("user", row[0].ToString(), Field.Store.YES),
                 new TextField("content", row[1].ToString(), Field.Store.YES),
-                new TextField("date", row[2].ToString(), Field.Store.YES),
+                new StringField("date", date != null ? DateOnly.Parse(date).ToString() : "-", Field.Store.YES),
             };
             IndexWriter.AddDocument(doc);
         }
@@ -59,5 +60,27 @@ public class TweetIndexer
         }
         //Flush and commit the index data to the directory
         IndexWriter.Commit();
+    }
+}
+
+/*
+ * Source:
+ * https://stackoverflow.com/questions/1857513/get-substring-everything-before-certain-char
+ */
+static class Helper
+{
+    public static string GetUntilOrEmpty(this string? text, string stopAt = "-")
+    {
+        if (!String.IsNullOrWhiteSpace(text))
+        {
+            int charLocation = text.IndexOf(stopAt, StringComparison.Ordinal);
+
+            if (charLocation > 0)
+            {
+                return text.Substring(0, charLocation);
+            }
+        }
+
+        return String.Empty;
     }
 }
