@@ -52,7 +52,7 @@ public class TweetSearcher
         return docList;
     }
     
-    public IList<Document>? CustomQuery(Query userQuery, int numberOfResults = 5)
+    public List<Document>? CustomQuery(Query userQuery, int numberOfResults = 5)
     {
         var topDocs = Searcher.Search(userQuery, n: numberOfResults); //indicate we want the first n results
         Console.WriteLine($"Matching results: {topDocs.TotalHits}");
