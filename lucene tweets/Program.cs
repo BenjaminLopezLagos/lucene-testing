@@ -1,5 +1,8 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Collections.Concurrent;
+using System.Globalization;
+using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
+using CsvHelper;
 using Lucene.Net.Util;
 using Microsoft.Data.Analysis;
 using lucene_tweets;
@@ -33,7 +36,6 @@ foreach (var f in filePaths)
     indexer.AddTweetsToIndex(df);
 }
 */
-
 //var indexerTraining = new TweetIndexer(luceneVersion, indexNameTraining, new StandardAnalyzer(luceneVersion));
 //indexer.AddTweetsToIndex(df2);
 //indexerTraining.AddTrainingSetToIndex(df: trainingDf);
@@ -58,8 +60,7 @@ query.Add(new WildcardQuery(new Term("content", "c*m")), Occur.MUST);
 */
 var query = new MatchAllDocsQuery();
 
-var resultsFromQuery = 5000;
-var resultDocs = searcher.CustomQuery(query, numberOfResults: resultsFromQuery);
+var resultDocs = searcher.CustomQuery(query, numberOfResults: 15000);
 //TweetSearcher.PrintResults(resultDocs);
 /*
 var termFreqDf = new DataFrame(columns: new DataFrameColumn[]
@@ -83,29 +84,19 @@ DataFrame.SaveCsv(termFreqDf, @"..\\..\\..\\TFID.csv");
 */
 if (resultDocs != null)
 {
-    var count = 0;
-    DataFrameColumn[] columns = {
-        new StringDataFrameColumn("user"),
-        new StringDataFrameColumn("content"),
-        new PrimitiveDataFrameColumn<DateTime>("date"),
-        new StringDataFrameColumn("class")
-    };
-    var df = new DataFrame(columns);
-
-    foreach (var d in CollectionsMarshal.AsSpan(resultDocs))
-    {
-        ClassificationResult<BytesRef> classValue = nbc.AssignClass(d.Get("content"));
-        Console.WriteLine(count++);
-        df.Append(new[]
-        {
-            new KeyValuePair<string, object>("user", d.Get("user")),
-            new KeyValuePair<string, object>("content",d.Get("content").Replace("\n", " ").Replace("\r", " ")),
-            new KeyValuePair<string, object>("date", DateTime.Parse(d.Get("date"))),
-            new KeyValuePair<string, object>("class", classValue.AssignedClass.Utf8ToString())
-        }, inPlace: true);
-        Console.WriteLine($"{d.Get("content")} \n {classValue.AssignedClass.Utf8ToString()}"); 
-    }
+    var concurrentTweetBag = new ConcurrentBag<Document>(resultDocs);
+    var tweets = new ConcurrentBag<Tweet>();
+    concurrentTweetBag.AsParallel().ForAll( t=>
+        tweets.Add(new Tweet(t.Get("user"),
+            $"{ '"' } {t.Get("content").Replace("\n", " ").Replace("\r", " ")} { '"' }",
+            DateTime.Parse(t.Get("date")).ToShortDateString(),
+            "?"))
+        );
+    tweets.AsParallel().ForAll(t => t.Content = nbc.AssignClass(t.Content).AssignedClass.Utf8ToString());
     Console.WriteLine("writing");
-    DataFrame.SaveCsv(df, @"..\\..\\..\\ClassifiedTweets.csv");
+    using var writer = new StreamWriter(@"..\\..\\..\\ClassifiedTweets.csv");
+    using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
+    csv.WriteRecords(tweets.ToList());
+    csv.Flush();
 }
 Console.WriteLine("done");

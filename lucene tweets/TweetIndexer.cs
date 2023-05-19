@@ -32,8 +32,8 @@ public class TweetIndexer
         //Add documents to the index
         foreach(var row in df.Rows)
         {
-            //var date = Helper.GetUntilOrEmpty(row[2].ToString(), " · ");
-            var date = Helper.GetUntilOrEmpty(row[2].ToString().Replace(" · ", " "), "UTC");
+            var date = Helper.GetUntilOrEmpty(row[2].ToString(), " · ");
+            //var date = Helper.GetUntilOrEmpty(row[2].ToString().Replace(" · ", " "), "UTC");
             var doc = new Document
             {
                 new StringField("user", row[0].ToString(), Field.Store.YES),

@@ -2,12 +2,12 @@
 
 public class Tweet
 {
-    public string User { get; }
-    public string Content { get; }
-    public DateTime Date { get; }
-    public string Class { get; }
+    public string User { get; set; }
+    public string Content { get; set; }
+    public string Date { get; set; }
+    public string Class { get; set; }
     
-    public Tweet(string user, string content, DateTime date)
+    public Tweet(string user, string content, string date)
     {
         User = user;
         Content = content;
@@ -15,7 +15,7 @@ public class Tweet
         Class = "?";
     }
 
-    public Tweet(string user, string content, DateTime date, string @class)
+    public Tweet(string user, string content, string date, string @class)
     {
         User = user;
         Content = content;
