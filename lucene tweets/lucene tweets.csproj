@@ -15,6 +15,7 @@
     <PackageReference Include="Lucene.Net.Classification" Version="4.8.0-beta00016" />
     <PackageReference Include="Lucene.Net.QueryParser" Version="4.8.0-beta00016" />
     <PackageReference Include="Microsoft.Data.Analysis" Version="0.20.1" />
+    <PackageReference Include="Microsoft.ML" Version="3.0.0-preview.23266.6" />
   </ItemGroup>
 
 </Project>

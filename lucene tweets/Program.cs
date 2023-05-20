@@ -6,24 +6,21 @@ using CsvHelper;
 using Lucene.Net.Util;
 using Microsoft.Data.Analysis;
 using lucene_tweets;
+using lucene_tweets.ML_Models;
 using Lucene.Net.Analysis.Standard;
 using Lucene.Net.Classification;
 using Lucene.Net.Documents;
 using Lucene.Net.Index;
 using Lucene.Net.Search;
+using Microsoft.ML;
 using LuceneDirectory = Lucene.Net.Store.Directory;
 using Document = Lucene.Net.Documents.Document;
 
 // Specify the compatibility version we want
 const LuceneVersion luceneVersion = LuceneVersion.LUCENE_48;
-/****** DATA ******/
-//var df1 = DataFrame.LoadCsv("..\\..\\..\\output.csv");
-//var df2 = DataFrame.LoadCsv("..\\..\\..\\chiletweets.csv");
 
-//var trainingDf = DataFrame.LoadCsv("..\\..\\..\\dataset\\tweet_sentiment_dataset.csv");
 //Open the Directory using a Lucene Directory class
 var indexNameTweets = "example_index";
-var indexNameTraining = "training_index";
 
 /****** INDEXER ******/
 var indexer = new TweetIndexer(luceneVersion, indexNameTweets, new StandardAnalyzer(luceneVersion));
@@ -36,22 +33,25 @@ foreach (var f in filePaths)
     indexer.AddTweetsToIndex(df);
 }
 */
-//var indexerTraining = new TweetIndexer(luceneVersion, indexNameTraining, new StandardAnalyzer(luceneVersion));
-//indexer.AddTweetsToIndex(df2);
-//indexerTraining.AddTrainingSetToIndex(df: trainingDf);
 
 /****** SEARCHER ******/
 var searcher = new TweetSearcher(indexNameTweets);
-var searcherTrainingSet = new TweetSearcher(indexNameTraining);
 
 /****** CLASSIFIER ******/
-var nbc = new SimpleNaiveBayesClassifier();
+var ctx = new MLContext();
 
-nbc.Train(
-    SlowCompositeReaderWrapper.Wrap(searcherTrainingSet.IndexReader), textFieldName:"content",
-    classFieldName:"target",
-    new StandardAnalyzer(luceneVersion)
-    );
+//Step 2. Read in the input data from a text file for model training
+var dataView = ctx.Data.LoadFromTextFile<SentimentInput>("..\\..\\..\\ML_Models\\train.csv", hasHeader: true, separatorChar: ',', allowQuoting: true, trimWhitespace: true);
+var trainTestSplit = ctx.Data.TrainTestSplit(dataView, testFraction: 0.2);
+var trainingData = trainTestSplit.TrainSet;
+var testData = trainTestSplit.TestSet;
+
+var estimator = ctx.Transforms.Text.FeaturizeText(outputColumnName: "Features", inputColumnName: nameof(SentimentInput.Message))
+    .Append(ctx.BinaryClassification.Trainers.SdcaLogisticRegression(labelColumnName: "Label", featureColumnName: "Features"));
+
+var trainedModel = estimator.Fit(trainingData);
+var predEngine = ctx.Model.CreatePredictionEngine<SentimentInput, SentimentOutput>(trainedModel);
+
 /*
 var query = new BooleanQuery();
 //query.Add(new TermQuery(new Term("content", "csm")), Occur.MUST);
@@ -89,10 +89,9 @@ if (resultDocs != null)
     concurrentTweetBag.AsParallel().ForAll( t=>
         tweets.Add(new Tweet(t.Get("user"),
             $"{ '"' } {t.Get("content").Replace("\n", " ").Replace("\r", " ")} { '"' }",
-            DateTime.Parse(t.Get("date")).ToShortDateString(),
-            "?"))
+            DateTime.Parse(t.Get("date")).ToShortDateString()))
         );
-    tweets.AsParallel().ForAll(t => t.Content = nbc.AssignClass(t.Content).AssignedClass.Utf8ToString());
+    tweets.ToList().ForEach(t => t.Class = predEngine.Predict(new SentimentInput{Message = t.Content}));
     Console.WriteLine("writing");
     using var writer = new StreamWriter(@"..\\..\\..\\ClassifiedTweets.csv");
     using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
