@@ -32,13 +32,14 @@ public class TweetIndexer
         //Add documents to the index
         foreach(var row in df.Rows)
         {
-            var date = Helper.GetUntilOrEmpty(row[2].ToString(), " · ");
+            var date = DateTime.Parse(Helper.GetUntilOrEmpty(row[0].ToString(), " "));
+            var luceneDate = long.Parse(DateTools.DateToString(date, DateResolution.DAY));
             //var date = Helper.GetUntilOrEmpty(row[2].ToString().Replace(" · ", " "), "UTC");
             var doc = new Document
             {
-                new StringField("user", row[0].ToString(), Field.Store.YES),
-                new TextField("content", row[1].ToString(), Field.Store.YES),
-                new StringField("date", row[2] != null ? DateTime.Parse(date).ToString() : "-", Field.Store.YES),
+                new Int64Field("date",  luceneDate, Field.Store.YES),
+                new StringField("user", row[1].ToString(), Field.Store.YES),
+                new TextField("content", row[2].ToString(), Field.Store.YES),
             };
             IndexWriter.AddDocument(doc);
         }

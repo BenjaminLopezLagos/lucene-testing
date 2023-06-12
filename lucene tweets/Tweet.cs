@@ -1,16 +1,22 @@
 ﻿using lucene_tweets.DetectionModels;
+using Lucene.Net.Documents;
 using VaderSharp2;
 
 namespace lucene_tweets;
 
 public class Tweet
 {
-    public string Date { get; set; }
-    public SentimentOutput? MlOutput { get; set; }
+    //public SentimentOutput? MlOutput { get; set; }
     public double? VaderScore { get; set; }
-    public string User { get; set; }
-    public string Content { get; set; }
-    
+    public string? NaiveBayesLabel { get; set; }
+
+    public Lucene.Net.Documents.Document TweetContents { get; set; }
+
+    public Tweet(Lucene.Net.Documents.Document doc)
+    {
+        TweetContents = doc;
+    }
+    /*
     public Tweet(string user, string content, string date)
     {
         User = user;
@@ -25,22 +31,24 @@ public class Tweet
         Date = date;
         MlOutput = mlOutput;
     }
-
+    */
     public override string ToString()
     {
         var sentimentOutput = "";
-        if (MlOutput != null)
+        if (NaiveBayesLabel != null)
         {
-            sentimentOutput = $"{sentimentOutput}MLNet: {MlOutput.Sentiment}. \n";
+            sentimentOutput = $"{sentimentOutput}Naive Bayes: {NaiveBayesLabel}. \n";
         }
 
         if (VaderScore != null)
         {
             sentimentOutput = $"{sentimentOutput}Vader: {VaderScore}. \n";
         }
-        return $"USER: {User} \n" +
-               $"Contents: {Content} \n" +
-               $"Date: {Date} \n" +
+
+        var a = TweetContents.Get("date");
+        return $"USER: {TweetContents.Get("user")} \n" +
+               $"Contents: {TweetContents.Get("content")} \n" +
+               $"Date: {DateTools.StringToDate(TweetContents.Get("date")).ToShortDateString()} \n" +
                $"{sentimentOutput}";
     }
 }

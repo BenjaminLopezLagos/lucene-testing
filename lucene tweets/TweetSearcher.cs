@@ -7,13 +7,12 @@ using Lucene.Net.QueryParsers.Flexible.Standard;
 using Lucene.Net.Search;
 using Lucene.Net.Store;
 using Lucene.Net.Util;
-using Directory = Lucene.Net.Store.Directory;
 
 namespace lucene_tweets;
 
 public class TweetSearcher
 {
-    private Directory IndexDirectory { get; }
+    private Lucene.Net.Store.Directory IndexDirectory { get; }
     public IndexReader IndexReader { get; }
     private IndexSearcher Searcher { get; }
 
@@ -52,7 +51,7 @@ public class TweetSearcher
         return docList;
     }
     
-    public List<Document>? CustomQuery(Query userQuery, int numberOfResults = 5)
+    public IList<Document>? CustomQuery(Query userQuery, int numberOfResults = 5)
     {
         var topDocs = Searcher.Search(userQuery, n: numberOfResults); //indicate we want the first n results
         Console.WriteLine($"Matching results: {topDocs.TotalHits}");
@@ -77,8 +76,7 @@ public class TweetSearcher
 
         return docList;
     }
-
-    /*
+    
     public IList<Document>? CustomQuery(string field, string? userQuery, int numberOfResults = 5,
         LuceneVersion luceneVersion = LuceneVersion.LUCENE_48)
     {
@@ -107,7 +105,7 @@ public class TweetSearcher
 
         return docList;
     }
-*/
+    
     public static void PrintResults(IList<Document>? documents)
     {
         if (documents == null || documents.Count < 1)

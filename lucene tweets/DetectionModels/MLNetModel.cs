@@ -21,7 +21,8 @@ public class MlNetModel : DetectionStrategy
         var testData = trainTestSplit.TestSet;
 
         var estimator = ctx.Transforms.Text.FeaturizeText(outputColumnName: "Features", inputColumnName: nameof(SentimentInput.InputMessage))
-            .Append(ctx.BinaryClassification.Trainers.SdcaLogisticRegression(labelColumnName: "Label", featureColumnName: "Features"));
+            .Append(ctx.MulticlassClassification.Trainers.NaiveBayes(labelColumnName: "Label", featureColumnName: "Features"))
+            .Append(ctx.Transforms.Conversion.MapKeyToValue("PredictedLabel"));
 
         var trainedModel = estimator.Fit(trainingData);
         _engine = ctx.Model.CreatePredictionEngine<SentimentInput, SentimentOutput>(trainedModel);
@@ -40,6 +41,6 @@ public class MlNetModel : DetectionStrategy
     public void DetectEmotion(IEnumerable<Tweet> tweets)
     {
         var t = tweets.ToList();
-        t.ForEach(x => x.MlOutput = _engine.Predict(new SentimentInput{InputMessage = Stemmer.StemInput(x.Content)}));
+       // t.ForEach(x => x.MlOutput = _engine.Predict(new SentimentInput{InputMessage = Stemmer.StemInput(x.TweetContents.Get("content"))}));
     }
 }

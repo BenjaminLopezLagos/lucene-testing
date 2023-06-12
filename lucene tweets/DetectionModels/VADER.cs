@@ -1,4 +1,6 @@
-﻿namespace lucene_tweets.DetectionModels;
+﻿using System.Collections.Concurrent;
+
+namespace lucene_tweets.DetectionModels;
 using VaderSharp2;
 
 public class Vader : DetectionStrategy
@@ -6,6 +8,7 @@ public class Vader : DetectionStrategy
     public void DetectEmotion(IEnumerable<Tweet> tweets)
     {
         var analyzer = new SentimentIntensityAnalyzer();
+        //var concurrentTweets = new ConcurrentBag<Tweet>(tweets);
         /*
         tweets.AsParallel().ForAll(x => x.VaderValues = new Dictionary<string, double>
         {
@@ -14,6 +17,6 @@ public class Vader : DetectionStrategy
             { "Neutral", analyzer.PolarityScores(x.Content).Neutral }
         });
         */
-        tweets.AsParallel().ForAll(x => x.VaderScore = analyzer.PolarityScores(x.Content).Compound);
+        tweets.ToList().ForEach(x => x.VaderScore = analyzer.PolarityScores(x.TweetContents.Get("content")).Compound);
     }
 }
