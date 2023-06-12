@@ -61,10 +61,14 @@ query.Add(new WildcardQuery(new Term("content", "#*news")), Occur.MUST_NOT);
 */
 query.Add(new TermQuery(new Term("content", "twitter")), Occur.MUST);
 query.Add(new TermQuery(new Term("content", "api")), Occur.MUST);
+query.Add(new FuzzyQuery(new Term("content", "pa~3")), Occur.SHOULD);
 query.Add(new TermQuery(new Term("user", "danspena")), Occur.MUST_NOT);
-query.Add(new FuzzyQuery(new Term("user", "#BREAKING~1")), Occur.MUST_NOT);
-query.Add(new FuzzyQuery(new Term("content", "via ~")), Occur.MUST_NOT);
+query.Add(new FuzzyQuery(new Term("content", "#BREAKING~1")), Occur.MUST_NOT);
 query.Add(new WildcardQuery(new Term("content", "#*news")), Occur.MUST_NOT);
+query.Add(new WildcardQuery(new Term("content", "?businessinsider")), Occur.MUST_NOT);
+query.Add(new WildcardQuery(new Term("content", "#*news")), Occur.MUST_NOT);
+query.Add(new TermQuery(new Term("content", "gHacks Tech News ")), Occur.MUST_NOT);
+
 
 //query.Add(new FuzzyQuery(new Term("content", "fail~")), Occur.MUST);
 //query.Add(NumericRangeQuery.NewInt32Range(field:"views",min:0, max:100,true,true), Occur.MUST);
@@ -74,7 +78,7 @@ query.Add(new WildcardQuery(new Term("content", "#*news")), Occur.MUST_NOT);
 var date1 = "20230506";
 var date2 = "20230606";
 var strQuery = $"[{date1} TO {date2}]";
-var resultDocs = searcher.CustomQuery(query, numberOfResults: 100000);
+var resultDocs = searcher.CustomQuery(query, numberOfResults: 500);
 //TweetSearcher.PrintResults(resultDocs);
 /*
 var termFreqDf = new DataFrame(columns: new DataFrameColumn[]

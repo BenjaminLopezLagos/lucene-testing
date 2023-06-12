@@ -27,12 +27,13 @@ public class LuceneNaiveBayes : DetectionStrategy
             , new StandardAnalyzer(LuceneVersion.LUCENE_48));
             */
         Console.WriteLine("training nb");
-        foreach (AtomicReaderContext context in IndexReader.Leaves)
+        var analyzer = new StandardAnalyzer(LuceneVersion.LUCENE_48);
+        foreach (var context in IndexReader.Leaves)
         {
             Classifier.Train(context.AtomicReader
                 , "content"
                 , "target"
-                , new StandardAnalyzer(LuceneVersion.LUCENE_48));
+                , analyzer);
         }
         Console.WriteLine("training nb done");
     }
