@@ -32,7 +32,7 @@ var trainingIndexNb = "training_index";
 
 /****** INDEXER ******/
 var indexer = new TweetIndexer(luceneVersion, indexNameTweets, new StandardAnalyzer(luceneVersion));
-var filePaths = Directory.GetFiles("D:\\snscrape_tweets");
+var filePaths = Directory.GetFiles("C:\\Users\\benja\\Desktop\\scraper\\tweets");
 /*
 indexer.DeleteCurrentIndex();
 Console.WriteLine("indexing");
@@ -47,9 +47,9 @@ Console.WriteLine("indexing done");
 var searcher = new TweetSearcher(indexNameTweets);
 
 /****** CLASSIFIER ******/
-var naiveBayes = new LuceneNaiveBayes();
+//var naiveBayes = new LuceneNaiveBayes();
 var vader = new Vader();
-var sentimentDetector = new SentimentDetection(naiveBayes);
+var sentimentDetector = new SentimentDetection(vader);
 
 var query = new BooleanQuery();
 /*
@@ -60,14 +60,16 @@ query.Add(new FuzzyQuery(new Term("content", "via ~")), Occur.MUST_NOT);
 query.Add(new WildcardQuery(new Term("content", "#*news")), Occur.MUST_NOT);
 */
 query.Add(new TermQuery(new Term("content", "twitter")), Occur.MUST);
+query.Add(new FuzzyQuery(new Term("content", "pa~3")), Occur.MUST);
 query.Add(new TermQuery(new Term("content", "api")), Occur.MUST);
-query.Add(new FuzzyQuery(new Term("content", "pa~3")), Occur.SHOULD);
 query.Add(new TermQuery(new Term("user", "danspena")), Occur.MUST_NOT);
 query.Add(new FuzzyQuery(new Term("content", "#BREAKING~1")), Occur.MUST_NOT);
-query.Add(new WildcardQuery(new Term("content", "#*news")), Occur.MUST_NOT);
+query.Add(new WildcardQuery(new Term("content", "*news")), Occur.MUST_NOT);
 query.Add(new WildcardQuery(new Term("content", "?businessinsider")), Occur.MUST_NOT);
-query.Add(new WildcardQuery(new Term("content", "#*news")), Occur.MUST_NOT);
+query.Add(new WildcardQuery(new Term("user", "guardian*")), Occur.MUST_NOT);
 query.Add(new TermQuery(new Term("content", "gHacks Tech News ")), Occur.MUST_NOT);
+query.Add(new TermQuery(new Term("content", "TechCrunch")), Occur.MUST_NOT);
+query.Add(new TermQuery(new Term("user", "BizzBuzzNews")), Occur.MUST_NOT);
 
 
 //query.Add(new FuzzyQuery(new Term("content", "fail~")), Occur.MUST);
@@ -116,8 +118,8 @@ if (resultDocs != null)
     Console.WriteLine("classifying with model 1");
     sentimentDetector.ExecuteDetector(tweets);
     Console.WriteLine("classifying with model 2");
-    sentimentDetector.ChangeStrategy(vader);
-    sentimentDetector.ExecuteDetector(tweets);
+    //sentimentDetector.ChangeStrategy(vader);
+    //sentimentDetector.ExecuteDetector(tweets);
     Console.WriteLine("writing");
     //using var writer = new StreamWriter(@"..\\..\\..\\ClassifiedTweets.csv");
     //using var csv = new CsvWriter(writer,  new CsvConfiguration(CultureInfo.CurrentCulture) { Delimiter = ";"});
