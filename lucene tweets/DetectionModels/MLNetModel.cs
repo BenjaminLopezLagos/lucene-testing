@@ -1,31 +1,53 @@
 ﻿using Microsoft.Data.Analysis;
 using Microsoft.ML;
+using Microsoft.ML.Data;
+using Microsoft.ML.TorchSharp;
+using Microsoft.ML.TorchSharp.NasBert;
 
 namespace lucene_tweets.DetectionModels;
 
 public class MlNetModel : DetectionStrategy
 {
     private string _datasetPath = "..\\..\\..\\DetectionModels"; 
-    private readonly PredictionEngine<SentimentInput, SentimentOutput> _engine;
+    public PredictionEngine<SentimentInput, SentimentOutput> Engine { get; }
 
     public MlNetModel()
     {
-        var ctx = new MLContext();
-        var dataView = ctx.Data.LoadFromTextFile<SentimentInput>($"{_datasetPath}\\train.csv",
+        var mlContext = new MLContext();
+        var reviews = new[]
+        {
+            new {Text = "This is a bad steak", Sentiment = "Negative"},
+            new {Text = "I really like this restaurant", Sentiment = "Positive"}
+        };
+        var dataView = mlContext.Data.LoadFromTextFile<SentimentInput>($"{_datasetPath}\\train.csv",
             hasHeader: true,
             separatorChar: ',',
             allowQuoting: true,
             trimWhitespace: true);
-        var trainTestSplit = ctx.Data.TrainTestSplit(dataView, testFraction: 0.2);
-        var trainingData = trainTestSplit.TrainSet;
-        var testData = trainTestSplit.TestSet;
+        var dataSplit = mlContext.Data.TrainTestSplit(dataView, testFraction: 0.2);
+        var trainData = dataSplit.TrainSet;
+        var testData = dataSplit.TestSet;
+        //Define your training pipeline
+        var pipeline =
+            mlContext.Transforms.Conversion.MapValueToKey("Label", "Label")
+                .Append(mlContext.MulticlassClassification.Trainers.TextClassification(labelColumnName: "Label", sentence1ColumnName: "Sentence"))
+                .Append(mlContext.Transforms.Conversion.MapKeyToValue("PredictedLabel", "PredictedLabel"));
 
-        var estimator = ctx.Transforms.Text.FeaturizeText(outputColumnName: "Features", inputColumnName: nameof(SentimentInput.InputMessage))
-            .Append(ctx.MulticlassClassification.Trainers.NaiveBayes(labelColumnName: "Label", featureColumnName: "Features"))
-            .Append(ctx.Transforms.Conversion.MapKeyToValue("PredictedLabel"));
+        Console.WriteLine("Training...");
+        // Train the model
+        var model = pipeline.Fit(trainData);
+        Engine = mlContext.Model.CreatePredictionEngine<SentimentInput, SentimentOutput>(model);
+        mlContext.Model.Save(model, dataView.Schema, "D:\\model.zip");
+        Console.WriteLine("Training DONE");
 
-        var trainedModel = estimator.Fit(trainingData);
-        _engine = ctx.Model.CreatePredictionEngine<SentimentInput, SentimentOutput>(trainedModel);
+        Console.WriteLine("Evaluating model performance...");
+        // We need to apply the same transformations to our test set so it can be evaluated via the resulting model
+        var transformedTest = model.Transform(testData);
+        var metrics = mlContext.MulticlassClassification.Evaluate(transformedTest);
+        Console.WriteLine($"Macro Accuracy: {metrics.MacroAccuracy}");
+        Console.WriteLine($"Micro Accuracy: {metrics.MicroAccuracy}");
+        Console.WriteLine($"Log Loss: {metrics.LogLoss}");
+        Console.WriteLine();
     }
 
     private void ProcessTrainData()

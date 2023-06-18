@@ -5,7 +5,7 @@ namespace lucene_tweets.DetectionModels;
 public class SentimentInput
 {
     [LoadColumn(1), ColumnName("Label")]
-    public int Label { get; set; }
-    [LoadColumn(2)]
-    public string InputMessage { get; set; }
+    public float Label { get; set; }
+    [LoadColumn(2), ColumnName("Sentence")]
+    public string Sentence { get; set; }
 }

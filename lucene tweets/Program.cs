@@ -6,6 +6,7 @@ using System.Runtime.Serialization;
 using System.Text;
 using CsvHelper;
 using CsvHelper.Configuration;
+using BERTTokenizers;
 using Lucene.Net.Util;
 using Microsoft.Data.Analysis;
 using lucene_tweets;
@@ -20,12 +21,58 @@ using Lucene.Net.Index;
 using Lucene.Net.Queries.Function;
 using Lucene.Net.Search;
 using Microsoft.ML;
+using Microsoft.ML.TorchSharp;
+using Microsoft.ML.OnnxRuntime;
+using Microsoft.ML.OnnxRuntime.Tensors;
+using Microsoft.ML.TorchSharp.NasBert;
 using LuceneDirectory = Lucene.Net.Store.Directory;
 using Document = Lucene.Net.Documents.Document;
 
+//testing bert
+/*
+var testSentence = "lmao elon musk fucking sucks";
+var bTokenizer = new BertBaseTokenizer();
+var bTokens = bTokenizer.Tokenize(testSentence);
+var bEncoded = bTokenizer.Encode(bTokens.Count, testSentence);
+var bertInput = new BertInput()
+{
+    InputIds = bEncoded.Select(t => t.InputIds).ToArray(),
+    AttentionMask = bEncoded.Select(t => t.AttentionMask).ToArray(),
+    TypeIds = bEncoded.Select(t => t.TokenTypeIds).ToArray()
+};
+Console.WriteLine(string.Join(", ", bertInput.InputIds));
+var modelPath = @"D:\roBERTa models\roberta-base-11.onnx";
+var input_ids = BertInput.ConvertToTensor(bertInput.InputIds, bertInput.InputIds.Length);
+var attention_mask = BertInput.ConvertToTensor(bertInput.AttentionMask, bertInput.AttentionMask.Length);
+var token_type_ids = BertInput.ConvertToTensor(bertInput.TypeIds, bertInput.TypeIds.Length);
+
+var input = new List<NamedOnnxValue>
+{
+    NamedOnnxValue.CreateFromTensor("input_ids", input_ids),
+    NamedOnnxValue.CreateFromTensor("input_mask", attention_mask),
+    NamedOnnxValue.CreateFromTensor("segment_ids", token_type_ids)
+};
+var session = new InferenceSession(modelPath);
+var sessionOutput = session.Run(input);
+List<float> startLogits = (sessionOutput.ToList().First().Value as IEnumerable<float>).ToList();
+List<float> endLogits = (sessionOutput.ToList().Last().Value as IEnumerable<float>).ToList();
+var startIndex = startLogits.ToList().IndexOf(startLogits.Max());
+var endIndex = endLogits.ToList().IndexOf(endLogits.Max());
+var predictedTokens = bTokens.Skip(startIndex).Take(endIndex + 1 - startIndex)
+    .Select(o => bTokenizer.IdToToken((int)o.VocabularyIndex))
+    .ToList();
+*/
+// testing a different way
+var mlnet = new MlNetModel();
+var testInput = new SentimentInput()
+{
+    Sentence = "lol elon fucking sucks"
+};
+var testOutput = mlnet.Engine.Predict(testInput);
+Console.WriteLine(testOutput.Label);
 // Specify the compatibility version we want
 const LuceneVersion luceneVersion = LuceneVersion.LUCENE_48;
-
+Console.Read();
 //Open the Directory using a Lucene Directory class
 var indexNameTweets = "example_index";
 var trainingIndexNb = "training_index";

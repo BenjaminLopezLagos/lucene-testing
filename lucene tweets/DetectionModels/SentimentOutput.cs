@@ -4,8 +4,12 @@ namespace lucene_tweets.DetectionModels;
 
 public class SentimentOutput
 {
+    [ColumnName("Sentence")]
+    public string Sentence { get; set; }
+    [ColumnName("Label")]
+    public uint Label { get; set; }
     [ColumnName("PredictedLabel")]
-    public int Sentiment { get; set; }
-    public float Probability { get; set; }
-    public float Score { get; set; }
+    public float PredictedLabel { get; set; }
+    [ColumnName("Score")]
+    public float[] Score { get; set; }
 }
