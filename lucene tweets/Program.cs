@@ -32,7 +32,7 @@ var trainingIndexNb = "training_index";
 
 /****** INDEXER ******/
 var indexer = new TweetIndexer(luceneVersion, indexNameTweets, new StandardAnalyzer(luceneVersion));
-var filePaths = Directory.GetFiles("D:\\snscrape_tweets");
+var filePaths = Directory.GetFiles("D:\\snscrape_tweets\\dask results\\results");
 /*
 indexer.DeleteCurrentIndex();
 Console.WriteLine("indexing");
@@ -47,9 +47,8 @@ Console.WriteLine("indexing done");
 var searcher = new TweetSearcher(indexNameTweets);
 
 /****** CLASSIFIER ******/
-var naiveBayes = new LuceneNaiveBayes();
 var vader = new Vader();
-var sentimentDetector = new SentimentDetection(naiveBayes);
+var sentimentDetector = new SentimentDetection(vader);
 
 var query = new BooleanQuery();
 /*
@@ -116,8 +115,6 @@ if (resultDocs != null)
     Console.WriteLine("classifying with model 1");
     sentimentDetector.ExecuteDetector(tweets);
     Console.WriteLine("classifying with model 2");
-    sentimentDetector.ChangeStrategy(vader);
-    sentimentDetector.ExecuteDetector(tweets);
     Console.WriteLine("writing");
     //using var writer = new StreamWriter(@"..\\..\\..\\ClassifiedTweets.csv");
     //using var csv = new CsvWriter(writer,  new CsvConfiguration(CultureInfo.CurrentCulture) { Delimiter = ";"});
