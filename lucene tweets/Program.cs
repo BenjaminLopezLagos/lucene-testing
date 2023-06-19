@@ -28,7 +28,7 @@ using Microsoft.ML.TorchSharp.NasBert;
 using LuceneDirectory = Lucene.Net.Store.Directory;
 using Lucene.Net.Documents;
 
-var mlnet = new MlNetModel("D:\\model.zip");
+var mlnet = new MlNetModel();
 var testInput = new SentimentInput()
 {
     Sentence = "Juuuuuuuuuuuuuuuuussssst Chillin!!"

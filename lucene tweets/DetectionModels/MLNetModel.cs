@@ -15,19 +15,14 @@ public class MlNetModel : DetectionStrategy
     {
         var mlContext = new MLContext();
         
-        var reviews = new[]
-        {
-            new {Text = "This is a bad steak", Sentiment = "Negative"},
-            new {Text = "I really like this restaurant", Sentiment = "Positive"}
-        };
         var dataView = mlContext.Data.LoadFromTextFile<SentimentInput>($"{_datasetPath}\\Twitter_Dataset.csv",
             hasHeader: true,
             separatorChar: ',',
             allowQuoting: true,
             trimWhitespace: true);
-        //var dataSplit = mlContext.Data.TrainTestSplit(dataView, testFraction: 0.2);
-        //var trainData = dataSplit.TrainSet;
-        //var testData = dataSplit.TestSet;
+        var dataSplit = mlContext.Data.TrainTestSplit(dataView, testFraction: 0.2);
+        var trainData = dataSplit.TrainSet;
+        var testData = dataSplit.TestSet;
         //Define your training pipeline
         var pipeline =
             mlContext.Transforms.Conversion.MapValueToKey("Label", "Label")
@@ -40,14 +35,14 @@ public class MlNetModel : DetectionStrategy
 
         Console.WriteLine("Training...");
         // Train the model
-        var model = pipeline.Fit(dataView);
+        var model = pipeline.Fit(trainData);
         Engine = mlContext.Model.CreatePredictionEngine<SentimentInput, SentimentOutput>(model);
-        mlContext.Model.Save(model, dataView.Schema, $"{_datasetPath}\\model_roberta.zip");
+        mlContext.Model.Save(model, trainData.Schema, $"{_datasetPath}\\model_roberta.zip");
         Console.WriteLine("Training DONE");
 
         Console.WriteLine("Evaluating model performance...");
         // We need to apply the same transformations to our test set so it can be evaluated via the resulting model
-        var transformedTest = model.Transform(dataView);
+        var transformedTest = model.Transform(testData);
         var metrics = mlContext.MulticlassClassification.Evaluate(transformedTest);
         Console.WriteLine($"Macro Accuracy: {metrics.MacroAccuracy}");
         Console.WriteLine($"Micro Accuracy: {metrics.MicroAccuracy}");
