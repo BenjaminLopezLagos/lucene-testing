@@ -6,6 +6,6 @@ public class SentimentInput
 {
     [LoadColumn(1), ColumnName("Label")]
     public float Label { get; set; }
-    [LoadColumn(2), ColumnName("Sentence")]
+    [LoadColumn(0), ColumnName("Sentence")]
     public string Sentence { get; set; }
 }

@@ -26,53 +26,18 @@ using Microsoft.ML.OnnxRuntime;
 using Microsoft.ML.OnnxRuntime.Tensors;
 using Microsoft.ML.TorchSharp.NasBert;
 using LuceneDirectory = Lucene.Net.Store.Directory;
-using Document = Lucene.Net.Documents.Document;
+using Lucene.Net.Documents;
 
-//testing bert
-/*
-var testSentence = "lmao elon musk fucking sucks";
-var bTokenizer = new BertBaseTokenizer();
-var bTokens = bTokenizer.Tokenize(testSentence);
-var bEncoded = bTokenizer.Encode(bTokens.Count, testSentence);
-var bertInput = new BertInput()
-{
-    InputIds = bEncoded.Select(t => t.InputIds).ToArray(),
-    AttentionMask = bEncoded.Select(t => t.AttentionMask).ToArray(),
-    TypeIds = bEncoded.Select(t => t.TokenTypeIds).ToArray()
-};
-Console.WriteLine(string.Join(", ", bertInput.InputIds));
-var modelPath = @"D:\roBERTa models\roberta-base-11.onnx";
-var input_ids = BertInput.ConvertToTensor(bertInput.InputIds, bertInput.InputIds.Length);
-var attention_mask = BertInput.ConvertToTensor(bertInput.AttentionMask, bertInput.AttentionMask.Length);
-var token_type_ids = BertInput.ConvertToTensor(bertInput.TypeIds, bertInput.TypeIds.Length);
-
-var input = new List<NamedOnnxValue>
-{
-    NamedOnnxValue.CreateFromTensor("input_ids", input_ids),
-    NamedOnnxValue.CreateFromTensor("input_mask", attention_mask),
-    NamedOnnxValue.CreateFromTensor("segment_ids", token_type_ids)
-};
-var session = new InferenceSession(modelPath);
-var sessionOutput = session.Run(input);
-List<float> startLogits = (sessionOutput.ToList().First().Value as IEnumerable<float>).ToList();
-List<float> endLogits = (sessionOutput.ToList().Last().Value as IEnumerable<float>).ToList();
-var startIndex = startLogits.ToList().IndexOf(startLogits.Max());
-var endIndex = endLogits.ToList().IndexOf(endLogits.Max());
-var predictedTokens = bTokens.Skip(startIndex).Take(endIndex + 1 - startIndex)
-    .Select(o => bTokenizer.IdToToken((int)o.VocabularyIndex))
-    .ToList();
-*/
-// testing a different way
-var mlnet = new MlNetModel();
+var mlnet = new MlNetModel("D:\\model.zip");
 var testInput = new SentimentInput()
 {
-    Sentence = "lol elon fucking sucks"
+    Sentence = "Juuuuuuuuuuuuuuuuussssst Chillin!!"
 };
 var testOutput = mlnet.Engine.Predict(testInput);
-Console.WriteLine(testOutput.Label);
+Console.WriteLine($"label: {testOutput.Label} | predicted: {testOutput.PredictedLabel}");
+
 // Specify the compatibility version we want
 const LuceneVersion luceneVersion = LuceneVersion.LUCENE_48;
-Console.Read();
 //Open the Directory using a Lucene Directory class
 var indexNameTweets = "example_index";
 var trainingIndexNb = "training_index";
@@ -98,6 +63,8 @@ var vader = new Vader();
 var sentimentDetector = new SentimentDetection(vader);
 
 var query = new BooleanQuery();
+query.Add(new TermQuery(new Term("content", "elon")), Occur.MUST);
+query.Add(new TermQuery(new Term("user", "ElonAnnounces")), Occur.MUST_NOT);
 /*
 query.Add(new TermQuery(new Term("content", "twitter")), Occur.MUST);
 query.Add(new TermQuery(new Term("content", "blue")), Occur.SHOULD);
@@ -105,6 +72,8 @@ query.Add(new TermQuery(new Term("user", "danspena")), Occur.MUST_NOT);
 query.Add(new FuzzyQuery(new Term("content", "via ~")), Occur.MUST_NOT);
 query.Add(new WildcardQuery(new Term("content", "#*news")), Occur.MUST_NOT);
 */
+
+/*
 query.Add(new TermQuery(new Term("content", "twitter")), Occur.MUST);
 query.Add(new TermQuery(new Term("content", "api")), Occur.MUST);
 query.Add(new FuzzyQuery(new Term("content", "pa~3")), Occur.SHOULD);
@@ -114,7 +83,7 @@ query.Add(new WildcardQuery(new Term("content", "#*news")), Occur.MUST_NOT);
 query.Add(new WildcardQuery(new Term("content", "?businessinsider")), Occur.MUST_NOT);
 query.Add(new WildcardQuery(new Term("content", "#*news")), Occur.MUST_NOT);
 query.Add(new TermQuery(new Term("content", "gHacks Tech News ")), Occur.MUST_NOT);
-
+*/
 
 //query.Add(new FuzzyQuery(new Term("content", "fail~")), Occur.MUST);
 //query.Add(NumericRangeQuery.NewInt32Range(field:"views",min:0, max:100,true,true), Occur.MUST);
@@ -162,15 +131,24 @@ if (resultDocs != null)
     Console.WriteLine("classifying with model 1");
     sentimentDetector.ExecuteDetector(tweets);
     Console.WriteLine("classifying with model 2");
+    sentimentDetector.ChangeStrategy(mlnet);
+    sentimentDetector.ExecuteDetector(tweets);
     Console.WriteLine("writing");
     //using var writer = new StreamWriter(@"..\\..\\..\\ClassifiedTweets.csv");
     //using var csv = new CsvWriter(writer,  new CsvConfiguration(CultureInfo.CurrentCulture) { Delimiter = ";"});
     //csv.WriteRecords(tweets.ToList().OrderByDescending(x => x.MlOutput.Sentiment));
     //csv.Flush();
     tweets.ForEach(Console.WriteLine);
+    Console.WriteLine("ML.Net Results");
+    Console.WriteLine($"Positive: {tweets.Count(x => x.MlOutput.PredictedLabel > 0.5)*100 / tweets.Count}%");
+    Console.WriteLine($"Negative: {tweets.Count(x => x.MlOutput.PredictedLabel < 0.5)*100 / tweets.Count}%");
+    Console.WriteLine($"Neutral: {tweets.Count(x => x.MlOutput.PredictedLabel == 0.5)*100 / tweets.Count}%");
+    Console.WriteLine();
+    Console.WriteLine("VADER Results");
     Console.WriteLine($"Positive: {tweets.Count(x => x.VaderScore > 0)*100 / tweets.Count}%");
     Console.WriteLine($"Negative: {tweets.Count(x => x.VaderScore < 0)*100 / tweets.Count}%");
     Console.WriteLine($"Neutral: {tweets.Count(x => x.VaderScore == 0)*100 / tweets.Count}%");
+
 }
 
 Console.WriteLine("done");

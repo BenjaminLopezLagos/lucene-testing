@@ -6,7 +6,7 @@ namespace lucene_tweets;
 
 public class Tweet
 {
-    //public SentimentOutput? MlOutput { get; set; }
+    public SentimentOutput? MlOutput { get; set; }
     public double? VaderScore { get; set; }
     public string? NaiveBayesLabel { get; set; }
 
@@ -43,6 +43,11 @@ public class Tweet
         if (VaderScore != null)
         {
             sentimentOutput = $"{sentimentOutput}Vader: {VaderScore}. \n";
+        }
+        
+        if (MlOutput != null)
+        {
+            sentimentOutput = $"{sentimentOutput}BERT: {MlOutput.PredictedLabel}. \n";
         }
 
         var a = TweetContents.Get("date");
