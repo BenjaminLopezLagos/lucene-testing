@@ -54,7 +54,7 @@ public class MlNetModel : DetectionStrategy
     {
         var mlContext = new MLContext();
         DataViewSchema modelSchema;
-        var trainedModel = mlContext.Model.Load(modelPath, out modelSchema);
+        var trainedModel = mlContext.Model.Load($"{_datasetPath}\\{modelPath}", out modelSchema);
         Engine = mlContext.Model.CreatePredictionEngine<SentimentInput, SentimentOutput>(trainedModel);
     }
     

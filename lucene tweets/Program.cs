@@ -28,7 +28,7 @@ using Microsoft.ML.TorchSharp.NasBert;
 using LuceneDirectory = Lucene.Net.Store.Directory;
 using Lucene.Net.Documents;
 
-var mlnet = new MlNetModel();
+var mlnet = new MlNetModel("model.zip");
 var testInput = new SentimentInput()
 {
     Sentence = "Juuuuuuuuuuuuuuuuussssst Chillin!!"
@@ -64,7 +64,63 @@ var sentimentDetector = new SentimentDetection(vader);
 
 var query = new BooleanQuery();
 query.Add(new TermQuery(new Term("content", "elon")), Occur.MUST);
+
+// elon offers to buy Twitter at $54.20
+//query.Add(NumericRangeQuery.NewInt64Range(field:"date",min:20220414, max:20220416,true,true), Occur.MUST);
+// The social media platform accepts Musk's offer and announces the deal valuation at $44 billion.
+//query.Add(NumericRangeQuery.NewInt64Range(field:"date",min:20220425, max:20220427,true,true), Occur.MUST);
+// Musk says that the Twitter deal is ‘temporarily on hold’. He cites the prevalence of bots and spam accounts on the microblogging platform.
+//query.Add(NumericRangeQuery.NewInt64Range(field:"date",min:20220513, max:20220515,true,true), Occur.MUST);
+// Twitter shareholders bring class-action lawsuit against Musk over alleged stock manipulation tied to the acquisition process.
+//query.Add(NumericRangeQuery.NewInt64Range(field:"date",min:20220526, max:20220529,true,true), Occur.MUST);
+// Musk threatens to withdraw from the deal if the social media giant does not disclose information about bots and spams on the platform.
+//query.Add(NumericRangeQuery.NewInt64Range(field:"date",min:20220606, max:20220608,true,true), Occur.MUST);
+//query.Add(new TermQuery(new Term("content", "twitter")), Occur.MUST);
+// Musk moves to terminate his deal on issue of fake accounts
+//query.Add(NumericRangeQuery.NewInt64Range(field:"date",min:20220708, max:20220710,true,true), Occur.MUST);
+//query.Add(new TermQuery(new Term("content", "twitter")), Occur.MUST);
+// Twitter sues Musk in Delaware court to force him to complete the deal.
+//query.Add(NumericRangeQuery.NewInt64Range(field:"date",min:20220712, max:20220714,true,true), Occur.MUST);
+//query.Add(new TermQuery(new Term("content", "twitter")), Occur.MUST);
+
+
+
+// TERMS TO ALWAYS AVOID
 query.Add(new TermQuery(new Term("user", "ElonAnnounces")), Occur.MUST_NOT);
+query.Add(new FuzzyQuery(new Term("content", "Breaking")), Occur.MUST_NOT);
+query.Add(new FuzzyQuery(new Term("content", "BreakingNews")), Occur.MUST_NOT);
+query.Add(new FuzzyQuery(new Term("user", "breaking"), 2, 4), Occur.MUST_NOT);
+query.Add(new TermQuery(new Term("content", "BREAKING:")), Occur.MUST_NOT);
+query.Add(new FuzzyQuery(new Term("user", "news"),  2, 2), Occur.MUST_NOT);
+query.Add(new TermQuery(new Term("content", "LATEST:")), Occur.MUST_NOT);
+query.Add(new TermQuery(new Term("user", "DefiCinema")), Occur.MUST_NOT);
+query.Add(new TermQuery(new Term("user", "movierecite")), Occur.MUST_NOT);
+query.Add(new TermQuery(new Term("user", "kosmatos")), Occur.MUST_NOT);
+query.Add(new TermQuery(new Term("user", "SobhitSinha")), Occur.MUST_NOT);
+query.Add(new TermQuery(new Term("user", "CryptonewZi")), Occur.MUST_NOT);
+query.Add(new TermQuery(new Term("user", "StockandmoreCom")), Occur.MUST_NOT);
+query.Add(new TermQuery(new Term("user", "themetav3rse")), Occur.MUST_NOT);
+query.Add(new TermQuery(new Term("user", "MorningBrew")), Occur.MUST_NOT);
+query.Add(new TermQuery(new Term("user", "VisitoryNews")), Occur.MUST_NOT);
+query.Add(new TermQuery(new Term("user", "TraderMarcoCost")), Occur.MUST_NOT);
+query.Add(new TermQuery(new Term("user", "marketexplainor")), Occur.MUST_NOT);
+query.Add(new TermQuery(new Term("user", "KMJNOW")), Occur.MUST_NOT);
+query.Add(new TermQuery(new Term("user", "theblaze")), Occur.MUST_NOT);
+query.Add(new TermQuery(new Term("user", "UrbanRecorderPk")), Occur.MUST_NOT);
+query.Add(new TermQuery(new Term("user", "Raw_News1st")), Occur.MUST_NOT);
+query.Add(new TermQuery(new Term("user", "Andrey_Daniel_B")), Occur.MUST_NOT);
+query.Add(new TermQuery(new Term("user", "macronewswire")), Occur.MUST_NOT);
+query.Add(new TermQuery(new Term("user", "BoricuaEnMaui")), Occur.MUST_NOT);
+query.Add(new TermQuery(new Term("user", "BradHound")), Occur.MUST_NOT);
+query.Add(new TermQuery(new Term("user", "PBandJaimie")), Occur.MUST_NOT);
+query.Add(new TermQuery(new Term("user", "breakingmkts")), Occur.MUST_NOT);
+query.Add(new TermQuery(new Term("user", "faststocknewss")), Occur.MUST_NOT);
+query.Add(new FuzzyQuery(new Term("content", "What You Need to Know - CNET"),  2, 2), Occur.MUST_NOT);
+query.Add(new FuzzyQuery(new Term("user", "cgtnafrica"),  2, 2), Occur.MUST_NOT);
+query.Add(new FuzzyQuery(new Term("user", "Taipan57602002"),  2, 2), Occur.MUST_NOT);
+query.Add(new TermQuery(new Term("user", "CoinDiscoveryy")), Occur.MUST_NOT);
+query.Add(new TermQuery(new Term("user", "Claire__James")), Occur.MUST_NOT);
+
 /*
 query.Add(new TermQuery(new Term("content", "twitter")), Occur.MUST);
 query.Add(new TermQuery(new Term("content", "blue")), Occur.SHOULD);
@@ -90,9 +146,6 @@ query.Add(new TermQuery(new Term("content", "gHacks Tech News ")), Occur.MUST_NO
 //query.Add(new WildcardQuery(new Term("content", "c*m")), Occur.MUST);
 
 //var query = new MatchAllDocsQuery();
-var date1 = "20230506";
-var date2 = "20230606";
-var strQuery = $"[{date1} TO {date2}]";
 var resultDocs = searcher.CustomQuery(query, numberOfResults: 500);
 //TweetSearcher.PrintResults(resultDocs);
 /*
@@ -138,7 +191,7 @@ if (resultDocs != null)
     //using var csv = new CsvWriter(writer,  new CsvConfiguration(CultureInfo.CurrentCulture) { Delimiter = ";"});
     //csv.WriteRecords(tweets.ToList().OrderByDescending(x => x.MlOutput.Sentiment));
     //csv.Flush();
-    tweets.ForEach(Console.WriteLine);
+    tweets.OrderBy(o=>o.TweetContents.Get("date")).ToList().ForEach(Console.WriteLine);
     Console.WriteLine("ML.Net Results");
     Console.WriteLine($"Positive: {tweets.Count(x => x.MlOutput.PredictedLabel > 0.5)*100 / tweets.Count}%");
     Console.WriteLine($"Negative: {tweets.Count(x => x.MlOutput.PredictedLabel < 0.5)*100 / tweets.Count}%");
