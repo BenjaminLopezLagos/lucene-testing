@@ -11,14 +11,20 @@ namespace RIGUI
     {
         private double[] pValues = { 1, 1, 1, 1, 1, 1, 1 };
         private double[] nValues = { 0, 0, 0, 0, 0, 0, 0 };
-        private IList<Tweet> _tweets;
+        private IList<Tweet>? _tweets;
 
         public Form1()
         {
             InitializeComponent();
+            Task.Run(LoadResults);
+        }
+        private async Task LoadResults()
+        {
+            label1.Text = "Loading dashboard...";
+            label4.Text = "Unavailable";
+            label6.Text = "Unavailable";
             var mlnet = new MlNetModel(@"..\..\..\..\lucene tweets\DetectionModels\model.zip");
             var sentimentDetector = new SentimentDetection(mlnet);
-            const LuceneVersion luceneVersion = LuceneVersion.LUCENE_48;
             var indexPath = @"..\..\..\..\lucene tweets\example_index";
             var searcher = new TweetSearcher(indexPath);
             var query = new BooleanQuery();
@@ -27,13 +33,43 @@ namespace RIGUI
             if (resultDocs != null)
             {
                 label3.Text = resultDocs.Count.ToString();
-                _tweets = new List<Tweet>(resultDocs.Count);
-                resultDocs.ToList().ForEach(x => _tweets.Add(new Tweet(x)));
-                sentimentDetector.ExecuteDetector(_tweets);
+                await Task.Run(() => TransformDocsToTweets(sentimentDetector, resultDocs));
+                await Task.Run(UpdatePosNegTweetAmmount);
+                var tasks = new[]
+                {
+                    Task.Run(GeneratePlot_PolarityChanges),
+                };
+                Task.WaitAll(tasks);
+                label1.Text = "DASHBOARD";
+            }
+        }
+        
+        private async Task UpdatePosNegTweetAmmount()
+        {
+            await Task.Run(() =>
+            {
+                label4.Text = _tweets.Count(x => x.MlOutput > 0.5).ToString();
+                label6.Text = _tweets.Count(x => x.MlOutput > 0.5).ToString();
+            });
+        }
+        
+        private async Task TransformDocsToTweets(SentimentDetection detector,IEnumerable<Lucene.Net.Documents.Document> docs)
+        {
+            await Task.Run(() =>
+            {
+                _tweets = new List<Tweet>(docs.Count());
+                docs.ToList().ForEach(x => _tweets.Add(new Tweet(x)));
+                detector.ExecuteDetector(_tweets);
                 _tweets = _tweets.OrderBy(o=>o.TweetContents.Get("date")).ToList();
+            });
+        }
+        private async Task GeneratePlot_PolarityChanges()
+        {
+            await Task.Run(() =>
+            {
                 var tweetDates = _tweets.Select(
                     x => DateTools.StringToDate(x.TweetContents.Get("date"))
-                    ).Distinct().ToList();
+                ).Distinct().ToList();
                 int pointCount = tweetDates.Count();
                 var posValues = new List<double>(pointCount);
                 var negValues = new List<double>(pointCount);
@@ -58,9 +94,9 @@ namespace RIGUI
                 // indicate the horizontal axis tick labels should display DateTime units
                 formsPlot1.Plot.XAxis.DateTimeFormat(true);
                 formsPlot1.Refresh();
-            }
+            });
         }
-
+        
         private void EndResponsive()
         {
             if(Width < 500)
