@@ -44,7 +44,7 @@ var trainingIndexNb = "training_index";
 
 /****** INDEXER ******/
 var indexer = new TweetIndexer(luceneVersion, indexNameTweets, new StandardAnalyzer(luceneVersion));
-var filePaths = Directory.GetFiles("D:\\snscrape_tweets\\dask results\\results");
+//var filePaths = Directory.GetFiles("D:\\snscrape_tweets\\dask results\\results");
 /*
 indexer.DeleteCurrentIndex();
 Console.WriteLine("indexing");

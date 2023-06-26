@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "lucene tweets": {
+      "commandName": "Project"
+    },
+    "WSL": {
+      "commandName": "WSL2",
+      "distributionName": ""
+    }
+  }
+}
