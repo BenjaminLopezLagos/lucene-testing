@@ -14,13 +14,15 @@ public class MlNetModel : DetectionStrategy
     public MlNetModel()
     {
         var mlContext = new MLContext();
+        mlContext.GpuDeviceId = 0;
+        mlContext.FallbackToCpu = true;
         
-        var dataView = mlContext.Data.LoadFromTextFile<SentimentInput>($"{_datasetPath}\\Twitter_Dataset.csv",
+        var dataView = mlContext.Data.LoadFromTextFile<SentimentInput>($"{_datasetPath}\\Sentiment Analysis Dataset.csv",
             hasHeader: true,
             separatorChar: ',',
             allowQuoting: true,
             trimWhitespace: true);
-        var dataSplit = mlContext.Data.TrainTestSplit(dataView, testFraction: 0.2);
+        var dataSplit = mlContext.Data.TrainTestSplit(dataView, testFraction: 0.3);
         var trainData = dataSplit.TrainSet;
         var testData = dataSplit.TestSet;
         //Define your training pipeline
@@ -28,8 +30,9 @@ public class MlNetModel : DetectionStrategy
             mlContext.Transforms.Conversion.MapValueToKey("Label", "Label")
                 .Append(mlContext.MulticlassClassification.Trainers.TextClassification(
                     labelColumnName: "Label",
+                    batchSize: 512,
+                    maxEpochs: 3,
                     sentence1ColumnName: "Sentence",
-                    maxEpochs: 30,
                     architecture: BertArchitecture.Roberta))
                 .Append(mlContext.Transforms.Conversion.MapKeyToValue("PredictedLabel", "PredictedLabel"));
 
