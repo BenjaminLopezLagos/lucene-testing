@@ -28,7 +28,7 @@ using Microsoft.ML.TorchSharp.NasBert;
 using LuceneDirectory = Lucene.Net.Store.Directory;
 using Lucene.Net.Documents;
 
-var mlnet = new MlNetModel("model.zip");
+var mlnet = new MlNetModel($@"..\..\..\DetectionModels\model.zip");
 var testInput = new SentimentInput()
 {
     Sentence = "Juuuuuuuuuuuuuuuuussssst Chillin!!"
@@ -43,7 +43,7 @@ var indexNameTweets = "example_index";
 var trainingIndexNb = "training_index";
 
 /****** INDEXER ******/
-var indexer = new TweetIndexer(luceneVersion, indexNameTweets, new StandardAnalyzer(luceneVersion));
+var indexer = new TweetIndexer(luceneVersion, $@"..\..\..\{indexNameTweets}", new StandardAnalyzer(luceneVersion));
 //var filePaths = Directory.GetFiles("D:\\snscrape_tweets\\dask results\\results");
 /*
 indexer.DeleteCurrentIndex();
@@ -56,7 +56,7 @@ foreach (var f in filePaths)
 Console.WriteLine("indexing done");
 */
 /****** SEARCHER ******/
-var searcher = new TweetSearcher(indexNameTweets);
+var searcher = new TweetSearcher($@"..\..\..\{indexNameTweets}");
 
 /****** CLASSIFIER ******/
 var vader = new Vader();
@@ -153,7 +153,7 @@ query.Add(new TermQuery(new Term("content", "gHacks Tech News ")), Occur.MUST_NO
 //query.Add(new WildcardQuery(new Term("content", "c*m")), Occur.MUST);
 
 //var query = new MatchAllDocsQuery();
-var resultDocs = searcher.CustomQuery(query, numberOfResults: 5000);
+var resultDocs = searcher.CustomQuery(query, numberOfResults: 100);
 //TweetSearcher.PrintResults(resultDocs);
 /*
 var termFreqDf = new DataFrame(columns: new DataFrameColumn[]
@@ -186,6 +186,7 @@ if (resultDocs != null)
             DateTime.Parse(t.Get("date")).ToShortDateString()))
     );
     */
+    var xd = resultDocs[0].Fields;
     var tweets = new List<Tweet>(resultDocs.Count);
     resultDocs.ToList().ForEach(x => tweets.Add(new Tweet(x)));
     Console.WriteLine("classifying with model 1");
@@ -193,16 +194,16 @@ if (resultDocs != null)
     Console.WriteLine("classifying with model 2");
     //sentimentDetector.ChangeStrategy(mlnet);
     //sentimentDetector.ExecuteDetector(tweets);
-    Console.WriteLine("writing");
+    //Console.WriteLine("writing");
     //using var writer = new StreamWriter(@"..\\..\\..\\ClassifiedTweets.csv");
     //using var csv = new CsvWriter(writer,  new CsvConfiguration(CultureInfo.CurrentCulture) { Delimiter = ";"});
-    //csv.WriteRecords(tweets.ToList().OrderByDescending(x => x.MlOutput.Sentiment));
+    //csv.WriteRecords(tweets.ToList().OrderByDescending(x => x.MlOutput));
     //csv.Flush();
     tweets.OrderBy(o=>o.TweetContents.Get("date")).ToList().ForEach(Console.WriteLine);
     Console.WriteLine("ML.Net Results");
-    Console.WriteLine($"Positive: {tweets.Count(x => x.MlOutput.PredictedLabel > 0.5)*100 / tweets.Count}%");
-    Console.WriteLine($"Negative: {tweets.Count(x => x.MlOutput.PredictedLabel < 0.5)*100 / tweets.Count}%");
-    Console.WriteLine($"Neutral: {tweets.Count(x => x.MlOutput.PredictedLabel == 0.5)*100 / tweets.Count}%");
+    Console.WriteLine($"Positive: {tweets.Count(x => x.MlOutput > 0.5)*100 / tweets.Count}%");
+    Console.WriteLine($"Negative: {tweets.Count(x => x.MlOutput < 0.5)*100 / tweets.Count}%");
+    Console.WriteLine($"Neutral: {tweets.Count(x => x.MlOutput == 0.5)*100 / tweets.Count}%");
     Console.WriteLine();
     Console.WriteLine("VADER Results");
     Console.WriteLine($"Positive: {tweets.Count(x => x.VaderScore > 0)*100 / tweets.Count}%");

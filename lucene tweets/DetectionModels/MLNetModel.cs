@@ -57,7 +57,7 @@ public class MlNetModel : DetectionStrategy
     {
         var mlContext = new MLContext();
         DataViewSchema modelSchema;
-        var trainedModel = mlContext.Model.Load($"{_datasetPath}\\{modelPath}", out modelSchema);
+        var trainedModel = mlContext.Model.Load($"{modelPath}", out modelSchema);
         Engine = mlContext.Model.CreatePredictionEngine<SentimentInput, SentimentOutput>(trainedModel);
     }
     
@@ -74,6 +74,6 @@ public class MlNetModel : DetectionStrategy
     public void DetectEmotion(IEnumerable<Tweet> tweets)
     {
         var t = tweets.ToList();
-       t.ForEach(x => x.MlOutput = Engine.Predict(new SentimentInput{Sentence = x.TweetContents.Get("content")}));
+       t.ForEach(x => x.MlOutput = Engine.Predict(new SentimentInput{Sentence = x.Content}).PredictedLabel);
     }
 }
