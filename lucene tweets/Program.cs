@@ -60,25 +60,31 @@ var searcher = new TweetSearcher(indexNameTweets);
 
 /****** CLASSIFIER ******/
 var vader = new Vader();
-var sentimentDetector = new SentimentDetection(vader);
+var sentimentDetector = new SentimentDetection(mlnet);
 
 var query = new BooleanQuery();
 query.Add(new TermQuery(new Term("content", "elon")), Occur.MUST);
 
 // elon offers to buy Twitter at $54.20
 //query.Add(NumericRangeQuery.NewInt64Range(field:"date",min:20220414, max:20220416,true,true), Occur.MUST);
+
 // The social media platform accepts Musk's offer and announces the deal valuation at $44 billion.
 //query.Add(NumericRangeQuery.NewInt64Range(field:"date",min:20220425, max:20220427,true,true), Occur.MUST);
+
 // Musk says that the Twitter deal is ‘temporarily on hold’. He cites the prevalence of bots and spam accounts on the microblogging platform.
 //query.Add(NumericRangeQuery.NewInt64Range(field:"date",min:20220513, max:20220515,true,true), Occur.MUST);
+
 // Twitter shareholders bring class-action lawsuit against Musk over alleged stock manipulation tied to the acquisition process.
 //query.Add(NumericRangeQuery.NewInt64Range(field:"date",min:20220526, max:20220529,true,true), Occur.MUST);
+
 // Musk threatens to withdraw from the deal if the social media giant does not disclose information about bots and spams on the platform.
 //query.Add(NumericRangeQuery.NewInt64Range(field:"date",min:20220606, max:20220608,true,true), Occur.MUST);
 //query.Add(new TermQuery(new Term("content", "twitter")), Occur.MUST);
+
 // Musk moves to terminate his deal on issue of fake accounts
 //query.Add(NumericRangeQuery.NewInt64Range(field:"date",min:20220708, max:20220710,true,true), Occur.MUST);
 //query.Add(new TermQuery(new Term("content", "twitter")), Occur.MUST);
+
 // Twitter sues Musk in Delaware court to force him to complete the deal.
 //query.Add(NumericRangeQuery.NewInt64Range(field:"date",min:20220712, max:20220714,true,true), Occur.MUST);
 //query.Add(new TermQuery(new Term("content", "twitter")), Occur.MUST);
@@ -89,6 +95,7 @@ query.Add(new TermQuery(new Term("content", "elon")), Occur.MUST);
 query.Add(new TermQuery(new Term("user", "ElonAnnounces")), Occur.MUST_NOT);
 query.Add(new FuzzyQuery(new Term("content", "Breaking")), Occur.MUST_NOT);
 query.Add(new FuzzyQuery(new Term("content", "BreakingNews")), Occur.MUST_NOT);
+query.Add(new FuzzyQuery(new Term("content", "In a recent interview")), Occur.MUST_NOT);
 query.Add(new FuzzyQuery(new Term("user", "breaking"), 2, 4), Occur.MUST_NOT);
 query.Add(new TermQuery(new Term("content", "BREAKING:")), Occur.MUST_NOT);
 query.Add(new FuzzyQuery(new Term("user", "news"),  2, 2), Occur.MUST_NOT);
@@ -146,7 +153,7 @@ query.Add(new TermQuery(new Term("content", "gHacks Tech News ")), Occur.MUST_NO
 //query.Add(new WildcardQuery(new Term("content", "c*m")), Occur.MUST);
 
 //var query = new MatchAllDocsQuery();
-var resultDocs = searcher.CustomQuery(query, numberOfResults: 500);
+var resultDocs = searcher.CustomQuery(query, numberOfResults: 5000);
 //TweetSearcher.PrintResults(resultDocs);
 /*
 var termFreqDf = new DataFrame(columns: new DataFrameColumn[]
@@ -184,8 +191,8 @@ if (resultDocs != null)
     Console.WriteLine("classifying with model 1");
     sentimentDetector.ExecuteDetector(tweets);
     Console.WriteLine("classifying with model 2");
-    sentimentDetector.ChangeStrategy(mlnet);
-    sentimentDetector.ExecuteDetector(tweets);
+    //sentimentDetector.ChangeStrategy(mlnet);
+    //sentimentDetector.ExecuteDetector(tweets);
     Console.WriteLine("writing");
     //using var writer = new StreamWriter(@"..\\..\\..\\ClassifiedTweets.csv");
     //using var csv = new CsvWriter(writer,  new CsvConfiguration(CultureInfo.CurrentCulture) { Delimiter = ";"});
@@ -201,6 +208,7 @@ if (resultDocs != null)
     Console.WriteLine($"Positive: {tweets.Count(x => x.VaderScore > 0)*100 / tweets.Count}%");
     Console.WriteLine($"Negative: {tweets.Count(x => x.VaderScore < 0)*100 / tweets.Count}%");
     Console.WriteLine($"Neutral: {tweets.Count(x => x.VaderScore == 0)*100 / tweets.Count}%");
+    Console.Read();
 
 }
 
