@@ -11,7 +11,9 @@ namespace RIGUI
     {
         private double[] pValues = { 1, 1, 1, 1, 1, 1, 1 };
         private double[] nValues = { 0, 0, 0, 0, 0, 0, 0 };
-        private IList<Tweet>? _tweets;
+        private IList<Document>? _tweets;
+        private int _positiveTweetsAmount = 0;
+        private int _negativeTweetsAmount = 0;
 
         public Form1()
         {
@@ -25,15 +27,14 @@ namespace RIGUI
             label6.Text = "Unavailable";
             var mlnet = new MlNetModel(@"..\..\..\..\lucene tweets\DetectionModels\model.zip");
             var sentimentDetector = new SentimentDetection(mlnet);
-            var indexPath = @"..\..\..\..\lucene tweets\example_index";
+            var indexPath = @"..\..\..\..\lucene tweets\ClassifiedTweetsIndex";
             var searcher = new TweetSearcher(indexPath);
-            var query = new BooleanQuery();
-            query.Add(NumericRangeQuery.NewInt64Range(field:"date",min:20220420, max:20220427,true,true), Occur.MUST);
-            var resultDocs = searcher.CustomQuery(query, numberOfResults: 10000);
-            if (resultDocs != null)
+            var query = new MatchAllDocsQuery();
+            _tweets = searcher.CustomQuery(query, numberOfResults: 10000);
+            if (_tweets != null)
             {
-                label3.Text = resultDocs.Count.ToString();
-                await Task.Run(() => TransformDocsToTweets(sentimentDetector, resultDocs));
+                _tweets = _tweets.OrderBy(o=>o.Get("date")).ToList();
+                label3.Text = _tweets.Count.ToString();
                 await Task.Run(UpdatePosNegTweetAmmount);
                 var tasks = new[]
                 {
@@ -48,11 +49,15 @@ namespace RIGUI
         {
             await Task.Run(() =>
             {
-                label4.Text = _tweets.Count(x => x.MlOutput > 0.5).ToString();
-                label6.Text = _tweets.Count(x => x.MlOutput > 0.5).ToString();
+                _positiveTweetsAmount = _tweets.Count(x => 
+                    double.Parse(x.Get("mloutput").Replace(',', '.')) > 0.5);
+                _negativeTweetsAmount = _tweets.Count(x => 
+                    double.Parse(x.Get("mloutput").Replace(',', '.')) < 0.5);
+                label4.Text = _positiveTweetsAmount.ToString();
+                label6.Text = _negativeTweetsAmount.ToString();
             });
         }
-        
+        /*
         private async Task TransformDocsToTweets(SentimentDetection detector,IEnumerable<Lucene.Net.Documents.Document> docs)
         {
             await Task.Run(() =>
@@ -63,22 +68,27 @@ namespace RIGUI
                 _tweets = _tweets.OrderBy(o=>o.TweetContents.Get("date")).ToList();
             });
         }
+        */
         private async Task GeneratePlot_PolarityChanges()
         {
             await Task.Run(() =>
             {
                 var tweetDates = _tweets.Select(
-                    x => DateTools.StringToDate(x.TweetContents.Get("date"))
+                    x => DateTools.StringToDate(x.Get("date"))
                 ).Distinct().ToList();
                 int pointCount = tweetDates.Count();
                 var posValues = new List<double>(pointCount);
                 var negValues = new List<double>(pointCount);
                 foreach (var d in tweetDates)
                 {
-                    var tweetsInDate = _tweets.Where(x => x.Date == d).ToList();
+                    var tweetsInDate = _tweets.Where(x => DateTools.StringToDate(x.Get("date")) == d).ToList();
                     var tweetAmount_n = tweetsInDate.Count;
-                    var positives = tweetsInDate.Count(x => x.MlOutput > 0.5)*100 / tweetAmount_n;
-                    var negatives = tweetsInDate.Count(x => x.MlOutput < 0.5)*100 / tweetAmount_n;
+                    var positives = 
+                        tweetsInDate.Count(x => double.Parse(x.Get("mloutput").Replace(',', '.')) > 0.5) * 100 / tweetAmount_n;
+                    ;
+
+                    var negatives = 
+                        tweetsInDate.Count(x => double.Parse(x.Get("mloutput").Replace(',', '.')) < 0.5) * 100 / tweetAmount_n;
                     posValues.Add(positives);
                     negValues.Add(negatives);
                 }

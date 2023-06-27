@@ -18,4 +18,9 @@ public class SentimentDetection
     {
         _strategy.DetectEmotion(t);
     }
+    
+    public void ExecuteDetector(IEnumerable<Lucene.Net.Documents.Document> docs, TweetIndexer indexer)
+    {
+        _strategy.DetectEmotion(docs, indexer);
+    }
 }

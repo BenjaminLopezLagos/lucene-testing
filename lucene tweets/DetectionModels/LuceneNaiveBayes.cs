@@ -1,5 +1,6 @@
 ﻿using Lucene.Net.Analysis.Standard;
 using Lucene.Net.Classification;
+using Lucene.Net.Documents;
 using Lucene.Net.Index;
 using Lucene.Net.Store;
 using Lucene.Net.Util;
@@ -41,5 +42,10 @@ public class LuceneNaiveBayes : DetectionStrategy
     {
         tweets.ToList().ForEach(x => 
             x.NaiveBayesLabel = Classifier.AssignClass(x.TweetContents.Get("content")).AssignedClass.Utf8ToString());
+    }
+
+    public void DetectEmotion(IEnumerable<Document> docs, TweetIndexer indexer)
+    {
+        throw new NotImplementedException();
     }
 }

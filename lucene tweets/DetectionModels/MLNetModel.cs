@@ -1,4 +1,5 @@
-﻿using Microsoft.Data.Analysis;
+﻿using Lucene.Net.Documents;
+using Microsoft.Data.Analysis;
 using Microsoft.ML;
 using Microsoft.ML.Data;
 using Microsoft.ML.TorchSharp;
@@ -75,5 +76,23 @@ public class MlNetModel : DetectionStrategy
     {
         var t = tweets.ToList();
        t.ForEach(x => x.MlOutput = Engine.Predict(new SentimentInput{Sentence = x.Content}).PredictedLabel);
+    }
+    public void DetectEmotion(IEnumerable<Lucene.Net.Documents.Document> docs, TweetIndexer indexer)
+    {
+        //Add documents to the index
+        foreach(var d in docs)
+        {
+            var dClass = Engine.Predict(new SentimentInput { Sentence = d.Get("content") }).PredictedLabel;
+            var doc = new Document
+            {
+                new Int64Field("date",  long.Parse(d.Get("date")), Field.Store.YES),
+                new StringField("user", d.Get("user"), Field.Store.YES),
+                new TextField("content", d.Get("content"), Field.Store.YES),
+                new DoubleField("mloutput", dClass, Field.Store.YES),
+            };
+            indexer.IndexWriter.AddDocument(doc);
+        }
+        //Flush and commit the index data to the directory
+        indexer.IndexWriter.Commit();
     }
 }

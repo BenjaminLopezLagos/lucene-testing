@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using Lucene.Net.Documents;
 
 namespace lucene_tweets.DetectionModels;
 using VaderSharp2;
@@ -18,5 +19,10 @@ public class Vader : DetectionStrategy
         });
         */
         tweets.ToList().ForEach(x => x.VaderScore = analyzer.PolarityScores(x.TweetContents.Get("content")).Compound);
+    }
+
+    public void DetectEmotion(IEnumerable<Document> docs, TweetIndexer indexer)
+    {
+        throw new NotImplementedException();
     }
 }

@@ -43,10 +43,10 @@ var indexNameTweets = "example_index";
 var trainingIndexNb = "training_index";
 
 /****** INDEXER ******/
-var indexer = new TweetIndexer(luceneVersion, $@"..\..\..\{indexNameTweets}", new StandardAnalyzer(luceneVersion));
+var tweetIndexer = new TweetIndexer(luceneVersion, $@"..\..\..\{indexNameTweets}", new StandardAnalyzer(luceneVersion));
 //var filePaths = Directory.GetFiles("D:\\snscrape_tweets\\dask results\\results");
 /*
-indexer.DeleteCurrentIndex();
+tweetIndexer.DeleteCurrentIndex();
 Console.WriteLine("indexing");
 foreach (var f in filePaths)
 {
@@ -62,8 +62,8 @@ var searcher = new TweetSearcher($@"..\..\..\{indexNameTweets}");
 var vader = new Vader();
 var sentimentDetector = new SentimentDetection(mlnet);
 
-var query = new BooleanQuery();
-query.Add(new TermQuery(new Term("content", "elon")), Occur.MUST);
+//var query = new BooleanQuery();
+//query.Add(new TermQuery(new Term("content", "elon")), Occur.MUST);
 
 // elon offers to buy Twitter at $54.20
 //query.Add(NumericRangeQuery.NewInt64Range(field:"date",min:20220414, max:20220416,true,true), Occur.MUST);
@@ -90,7 +90,7 @@ query.Add(new TermQuery(new Term("content", "elon")), Occur.MUST);
 //query.Add(new TermQuery(new Term("content", "twitter")), Occur.MUST);
 
 
-
+/*
 // TERMS TO ALWAYS AVOID
 query.Add(new TermQuery(new Term("user", "ElonAnnounces")), Occur.MUST_NOT);
 query.Add(new FuzzyQuery(new Term("content", "Breaking")), Occur.MUST_NOT);
@@ -127,6 +127,7 @@ query.Add(new FuzzyQuery(new Term("user", "cgtnafrica"),  2, 2), Occur.MUST_NOT)
 query.Add(new FuzzyQuery(new Term("user", "Taipan57602002"),  2, 2), Occur.MUST_NOT);
 query.Add(new TermQuery(new Term("user", "CoinDiscoveryy")), Occur.MUST_NOT);
 query.Add(new TermQuery(new Term("user", "Claire__James")), Occur.MUST_NOT);
+*/
 
 /*
 query.Add(new TermQuery(new Term("content", "twitter")), Occur.MUST);
@@ -152,8 +153,8 @@ query.Add(new TermQuery(new Term("content", "gHacks Tech News ")), Occur.MUST_NO
 //query.Add(NumericRangeQuery.NewInt32Range(field:"views",min:0, max:100,true,true), Occur.MUST);
 //query.Add(new WildcardQuery(new Term("content", "c*m")), Occur.MUST);
 
-//var query = new MatchAllDocsQuery();
-var resultDocs = searcher.CustomQuery(query, numberOfResults: 100);
+var query = new MatchAllDocsQuery();
+var resultDocs = searcher.CustomQuery(query, numberOfResults: 100000);
 //TweetSearcher.PrintResults(resultDocs);
 /*
 var termFreqDf = new DataFrame(columns: new DataFrameColumn[]
@@ -177,17 +178,22 @@ DataFrame.SaveCsv(termFreqDf, @"..\\..\\..\\TFID.csv");
 */
 if (resultDocs != null)
 {
+    var classifiedTweetsPath = "ClassifiedTweetsIndex";
+    var classifiedTweetsIndexer  = new TweetIndexer(
+        luceneVersion,
+        $@"..\..\..\{classifiedTweetsPath}",
+        new StandardAnalyzer(luceneVersion));
+    classifiedTweetsIndexer.DeleteCurrentIndex();
+    sentimentDetector.ExecuteDetector(resultDocs, classifiedTweetsIndexer);
+    var classifiedTweetsSearcher = new TweetSearcher($@"..\..\..\{classifiedTweetsPath}");
+    var newResults = classifiedTweetsSearcher.CustomQuery(query);
+    newResults = newResults.OrderByDescending(x => x.Get("date")).ToList();
+    newResults.ToList().ForEach(x => Console.WriteLine($"{x.Get("user")}" + "\n" +
+                                                       $"{x.Get("content")}" + "\n" +
+                                                       $"{DateTools.StringToDate(x.Get("date")).ToShortDateString()}" + "\n" +
+                                                       $"{x.Get("mloutput")}"));
+
     /*
-    var docConcurrentBag = new ConcurrentBag<Document>(resultDocs);
-    var tweets = new ConcurrentBag<Tweet>();
-    docConcurrentBag.AsParallel().ForAll(t =>
-        tweets.Add(new Tweet(t.Get("user"),
-            $"'{t.Get("content").Replace("\n", " ").Replace("\r", " ")}'",
-            DateTime.Parse(t.Get("date")).ToShortDateString()))
-    );
-    */
-    var xd = resultDocs[0].Fields;
-    var tweets = new List<Tweet>(resultDocs.Count);
     resultDocs.ToList().ForEach(x => tweets.Add(new Tweet(x)));
     Console.WriteLine("classifying with model 1");
     sentimentDetector.ExecuteDetector(tweets);
@@ -200,17 +206,15 @@ if (resultDocs != null)
     //csv.WriteRecords(tweets.ToList().OrderByDescending(x => x.MlOutput));
     //csv.Flush();
     tweets.OrderBy(o=>o.TweetContents.Get("date")).ToList().ForEach(Console.WriteLine);
+    */
     Console.WriteLine("ML.Net Results");
-    Console.WriteLine($"Positive: {tweets.Count(x => x.MlOutput > 0.5)*100 / tweets.Count}%");
-    Console.WriteLine($"Negative: {tweets.Count(x => x.MlOutput < 0.5)*100 / tweets.Count}%");
-    Console.WriteLine($"Neutral: {tweets.Count(x => x.MlOutput == 0.5)*100 / tweets.Count}%");
+    var pos = newResults.Count(x => 
+        double.Parse(x.Get("mloutput").Replace(',', '.')) > 0.5) * 100 / newResults.Count;
+    var neg = newResults.Count(x => 
+        double.Parse(x.Get("mloutput").Replace(',', '.')) < 0.5) * 100 / newResults.Count;
+    Console.WriteLine($"Positive: {pos}%");
+    Console.WriteLine($"Negative: {neg}%");
     Console.WriteLine();
-    Console.WriteLine("VADER Results");
-    Console.WriteLine($"Positive: {tweets.Count(x => x.VaderScore > 0)*100 / tweets.Count}%");
-    Console.WriteLine($"Negative: {tweets.Count(x => x.VaderScore < 0)*100 / tweets.Count}%");
-    Console.WriteLine($"Neutral: {tweets.Count(x => x.VaderScore == 0)*100 / tweets.Count}%");
-    Console.Read();
-
 }
 
 Console.WriteLine("done");
