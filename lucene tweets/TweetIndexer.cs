@@ -13,9 +13,8 @@ public class TweetIndexer
 {
     private LuceneDirectory IndexDirectory { get; }
     public IndexWriter IndexWriter { get; }
-    public TweetIndexer(LuceneVersion luceneVersion, string indexName, Analyzer analyzer)
+    public TweetIndexer(LuceneVersion luceneVersion, string indexPath, Analyzer analyzer)
     {
-        var indexPath = Path.Combine(Environment.CurrentDirectory, indexName);
         IndexDirectory = FSDirectory.Open(indexPath);
         var indexConfig = new IndexWriterConfig(luceneVersion, analyzer);
         indexConfig.SetOpenMode(OpenMode.CREATE_OR_APPEND);

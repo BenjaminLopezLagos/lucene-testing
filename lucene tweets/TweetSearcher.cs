@@ -16,9 +16,8 @@ public class TweetSearcher
     public IndexReader IndexReader { get; }
     private IndexSearcher Searcher { get; }
 
-    public TweetSearcher(string indexName)
+    public TweetSearcher(string indexPath)
     {
-        var indexPath = Path.Combine(Environment.CurrentDirectory, indexName);
         IndexDirectory = FSDirectory.Open(indexPath);
         IndexReader = DirectoryReader.Open(IndexDirectory);
         Searcher = new IndexSearcher(IndexReader);
