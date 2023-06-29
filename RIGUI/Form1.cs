@@ -20,13 +20,22 @@ namespace RIGUI
         public Form1()
         {
             InitializeComponent();
+            label1.Text = "Loading dashboard...";
+            label4.Text = "Unavailable";
+            label6.Text = "Unavailable";
+            formsPlot1.Plot.Style(Style.Blue1);
+            formsPlot1.Refresh();
+
+            formsPlot2.Plot.Style(Style.Blue1);
+            formsPlot2.Refresh();
+
+            formsPlot3.Plot.Style(Style.Blue1);
+            formsPlot3.Refresh();
+
             Task.Run(LoadResults);
         }
         private async Task LoadResults()
         {
-            label1.Text = "Loading dashboard...";
-            label4.Text = "Unavailable";
-            label6.Text = "Unavailable";
             var mlnet = new MlNetModel(@"..\..\..\..\lucene tweets\DetectionModels\model.zip");
             var sentimentDetector = new SentimentDetection(mlnet);
             var indexPath = @"..\..\..\..\lucene tweets\ClassifiedTweetsIndex";
@@ -79,17 +88,11 @@ namespace RIGUI
             {
                 var values = new double[] { _positiveTweetsAmount, _negativeTweetsAmount };
                 var labels = new string[] { "Positives", "Negatives" };
-                formsPlot2.Plot.XLabel($"Total = {values.Sum()}.");
-                formsPlot2.Plot.Style(Style.Blue1);
                 var pie = formsPlot2.Plot.AddPie(values);
-                pie.Explode = true;
-                pie.DonutSize = .4;
                 pie.SliceLabels = labels;
-                pie.ShowLabels = true;
                 pie.ShowPercentages = true;
-                pie.ShowValues = true;
+                formsPlot2.Plot.Legend();
                 formsPlot2.Refresh();
-
             });
         }
 
@@ -109,7 +112,6 @@ namespace RIGUI
                     var tweetAmount_n = tweetsInDate.Count;
                     var positives = 
                         tweetsInDate.Count(x => double.Parse(x.Get("mloutput").Replace(',', '.')) > 0.5) * 100 / tweetAmount_n;
-                    ;
 
                     var negatives = 
                         tweetsInDate.Count(x => double.Parse(x.Get("mloutput").Replace(',', '.')) < 0.5) * 100 / tweetAmount_n;
@@ -123,6 +125,7 @@ namespace RIGUI
 
                 // plot the double arrays using a traditional scatter plot
                 formsPlot1.Plot.AddScatter(xs, posValues.ToArray());
+                formsPlot1.Plot.SetAxisLimits(yMin: 0, yMax: 100);
                 //formsPlot1.Plot.AddScatter(xs, negValues.ToArray());
 
                 // indicate the horizontal axis tick labels should display DateTime units
