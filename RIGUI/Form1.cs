@@ -4,6 +4,8 @@ using lucene_tweets.DetectionModels;
 using Lucene.Net.Documents;
 using Lucene.Net.Search;
 using Lucene.Net.Util;
+using static Lucene.Net.Queries.Function.ValueSources.MultiFunction;
+using ScottPlot;
 
 namespace RIGUI
 {
@@ -18,13 +20,19 @@ namespace RIGUI
         public Form1()
         {
             InitializeComponent();
+            label1.Text = "Loading dashboard...";
+            label4.Text = "Unavailable";
+            label6.Text = "Unavailable";
+            formsPlot1.Plot.Style(Style.Blue1);
+            formsPlot1.Refresh();
+
+            formsPlot2.Plot.Style(Style.Blue1);
+            formsPlot2.Refresh();
+
             Task.Run(LoadResults);
         }
         private async Task LoadResults()
         {
-            label1.Text = "Loading dashboard...";
-            label4.Text = "Unavailable";
-            label6.Text = "Unavailable";
             var mlnet = new MlNetModel(@"..\..\..\..\lucene tweets\DetectionModels\model.zip");
             var sentimentDetector = new SentimentDetection(mlnet);
             var indexPath = @"..\..\..\..\lucene tweets\ClassifiedTweetsIndex";
@@ -38,6 +46,7 @@ namespace RIGUI
                 await Task.Run(UpdatePosNegTweetAmmount);
                 var tasks = new[]
                 {
+                    Task.Run(GenerateOverallPolarity),
                     Task.Run(GeneratePlot_PolarityChanges),
                 };
                 Task.WaitAll(tasks);
@@ -69,6 +78,21 @@ namespace RIGUI
             });
         }
         */
+
+        private async Task GenerateOverallPolarity()
+        {
+            await Task.Run(() => 
+            {
+                var values = new double[] { _positiveTweetsAmount, _negativeTweetsAmount };
+                var labels = new string[] { "Positives", "Negatives" };
+                var pie = formsPlot2.Plot.AddPie(values);
+                pie.SliceLabels = labels;
+                pie.ShowPercentages = true;
+                formsPlot2.Plot.Legend();
+                formsPlot2.Refresh();
+            });
+        }
+
         private async Task GeneratePlot_PolarityChanges()
         {
             await Task.Run(() =>
@@ -85,7 +109,6 @@ namespace RIGUI
                     var tweetAmount_n = tweetsInDate.Count;
                     var positives = 
                         tweetsInDate.Count(x => double.Parse(x.Get("mloutput").Replace(',', '.')) > 0.5) * 100 / tweetAmount_n;
-                    ;
 
                     var negatives = 
                         tweetsInDate.Count(x => double.Parse(x.Get("mloutput").Replace(',', '.')) < 0.5) * 100 / tweetAmount_n;
@@ -99,6 +122,7 @@ namespace RIGUI
 
                 // plot the double arrays using a traditional scatter plot
                 formsPlot1.Plot.AddScatter(xs, posValues.ToArray());
+                formsPlot1.Plot.SetAxisLimits(yMin: 0, yMax: 100);
                 //formsPlot1.Plot.AddScatter(xs, negValues.ToArray());
 
                 // indicate the horizontal axis tick labels should display DateTime units
@@ -107,6 +131,7 @@ namespace RIGUI
             });
         }
         
+        /*
         private void EndResponsive()
         {
             if(Width < 500)
@@ -122,6 +147,7 @@ namespace RIGUI
                 tableLayoutPanel2.ColumnStyles[1].Width = tableLayoutPanel2.Width - (formsPlot1.Width + label10.Width);
             }
         }
+        */
 
         private void label9_Click(object sender, EventArgs e)
         {
