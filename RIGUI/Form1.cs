@@ -30,7 +30,7 @@ namespace RIGUI
             var indexPath = @"..\..\..\..\lucene tweets\ClassifiedTweetsIndex";
             var searcher = new TweetSearcher(indexPath);
             var query = new MatchAllDocsQuery();
-            _tweets = searcher.CustomQuery(query, numberOfResults: 10000);
+            _tweets = searcher.CustomQuery(query, numberOfResults: 30000);
             if (_tweets != null)
             {
                 _tweets = _tweets.OrderBy(o=>o.Get("date")).ToList();

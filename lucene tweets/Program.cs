@@ -154,7 +154,7 @@ query.Add(new TermQuery(new Term("content", "gHacks Tech News ")), Occur.MUST_NO
 //query.Add(new WildcardQuery(new Term("content", "c*m")), Occur.MUST);
 
 var query = new MatchAllDocsQuery();
-var resultDocs = searcher.CustomQuery(query, numberOfResults: 100000);
+var resultDocs = searcher.CustomQuery(query, numberOfResults: 1000);
 //TweetSearcher.PrintResults(resultDocs);
 /*
 var termFreqDf = new DataFrame(columns: new DataFrameColumn[]
@@ -183,8 +183,8 @@ if (resultDocs != null)
         luceneVersion,
         $@"..\..\..\{classifiedTweetsPath}",
         new StandardAnalyzer(luceneVersion));
-    classifiedTweetsIndexer.DeleteCurrentIndex();
-    sentimentDetector.ExecuteDetector(resultDocs, classifiedTweetsIndexer);
+    //classifiedTweetsIndexer.DeleteCurrentIndex();
+    //sentimentDetector.ExecuteDetector(resultDocs, classifiedTweetsIndexer);
     var classifiedTweetsSearcher = new TweetSearcher($@"..\..\..\{classifiedTweetsPath}");
     var newResults = classifiedTweetsSearcher.CustomQuery(query);
     newResults = newResults.OrderByDescending(x => x.Get("date")).ToList();
