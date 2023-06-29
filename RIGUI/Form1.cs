@@ -4,6 +4,8 @@ using lucene_tweets.DetectionModels;
 using Lucene.Net.Documents;
 using Lucene.Net.Search;
 using Lucene.Net.Util;
+using static Lucene.Net.Queries.Function.ValueSources.MultiFunction;
+using ScottPlot;
 
 namespace RIGUI
 {
@@ -38,6 +40,7 @@ namespace RIGUI
                 await Task.Run(UpdatePosNegTweetAmmount);
                 var tasks = new[]
                 {
+                    Task.Run(GenerateOverallPolarity),
                     Task.Run(GeneratePlot_PolarityChanges),
                 };
                 Task.WaitAll(tasks);
@@ -69,6 +72,27 @@ namespace RIGUI
             });
         }
         */
+
+        private async Task GenerateOverallPolarity()
+        {
+            await Task.Run(() => 
+            {
+                var values = new double[] { _positiveTweetsAmount, _negativeTweetsAmount };
+                var labels = new string[] { "Positives", "Negatives" };
+                formsPlot2.Plot.XLabel($"Total = {values.Sum()}.");
+                formsPlot2.Plot.Style(Style.Blue1);
+                var pie = formsPlot2.Plot.AddPie(values);
+                pie.Explode = true;
+                pie.DonutSize = .4;
+                pie.SliceLabels = labels;
+                pie.ShowLabels = true;
+                pie.ShowPercentages = true;
+                pie.ShowValues = true;
+                formsPlot2.Refresh();
+
+            });
+        }
+
         private async Task GeneratePlot_PolarityChanges()
         {
             await Task.Run(() =>
@@ -107,6 +131,7 @@ namespace RIGUI
             });
         }
         
+        /*
         private void EndResponsive()
         {
             if(Width < 500)
@@ -122,6 +147,7 @@ namespace RIGUI
                 tableLayoutPanel2.ColumnStyles[1].Width = tableLayoutPanel2.Width - (formsPlot1.Width + label10.Width);
             }
         }
+        */
 
         private void label9_Click(object sender, EventArgs e)
         {

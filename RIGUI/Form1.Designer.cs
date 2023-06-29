@@ -31,10 +31,12 @@
             this.panel1 = new System.Windows.Forms.Panel();
             this.label1 = new System.Windows.Forms.Label();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
+            this.formsPlot3 = new ScottPlot.FormsPlot();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
             this.formsPlot1 = new ScottPlot.FormsPlot();
-            this.label10 = new System.Windows.Forms.Label();
+            this.formsPlot2 = new ScottPlot.FormsPlot();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.panel6 = new System.Windows.Forms.Panel();
             this.label8 = new System.Windows.Forms.Label();
@@ -50,6 +52,7 @@
             this.label2 = new System.Windows.Forms.Label();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
+            this.tableLayoutPanel3.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.flowLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
@@ -84,15 +87,39 @@
             // 
             // panel2
             // 
-            this.panel2.BackColor = System.Drawing.Color.Gainsboro;
+            this.panel2.BackColor = System.Drawing.Color.Gray;
+            this.panel2.Controls.Add(this.tableLayoutPanel3);
             this.panel2.Controls.Add(this.tableLayoutPanel2);
             this.panel2.Controls.Add(this.tableLayoutPanel1);
             this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel2.Location = new System.Drawing.Point(0, 34);
             this.panel2.Name = "panel2";
             this.panel2.Padding = new System.Windows.Forms.Padding(10);
-            this.panel2.Size = new System.Drawing.Size(975, 594);
+            this.panel2.Size = new System.Drawing.Size(975, 679);
             this.panel2.TabIndex = 1;
+            // 
+            // tableLayoutPanel3
+            // 
+            this.tableLayoutPanel3.ColumnCount = 2;
+            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel3.Controls.Add(this.formsPlot3, 0, 0);
+            this.tableLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel3.Location = new System.Drawing.Point(10, 400);
+            this.tableLayoutPanel3.Margin = new System.Windows.Forms.Padding(0);
+            this.tableLayoutPanel3.Name = "tableLayoutPanel3";
+            this.tableLayoutPanel3.RowCount = 1;
+            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel3.Size = new System.Drawing.Size(955, 269);
+            this.tableLayoutPanel3.TabIndex = 2;
+            // 
+            // formsPlot3
+            // 
+            this.formsPlot3.Location = new System.Drawing.Point(4, 3);
+            this.formsPlot3.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.formsPlot3.Name = "formsPlot3";
+            this.formsPlot3.Size = new System.Drawing.Size(467, 263);
+            this.formsPlot3.TabIndex = 0;
             // 
             // tableLayoutPanel2
             // 
@@ -100,7 +127,7 @@
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 350F));
             this.tableLayoutPanel2.Controls.Add(this.flowLayoutPanel1, 0, 0);
-            this.tableLayoutPanel2.Controls.Add(this.label10, 1, 0);
+            this.tableLayoutPanel2.Controls.Add(this.formsPlot2, 1, 0);
             this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Top;
             this.tableLayoutPanel2.Location = new System.Drawing.Point(10, 122);
             this.tableLayoutPanel2.Name = "tableLayoutPanel2";
@@ -127,15 +154,13 @@
             this.formsPlot1.Size = new System.Drawing.Size(595, 275);
             this.formsPlot1.TabIndex = 0;
             // 
-            // label10
+            // formsPlot2
             // 
-            this.label10.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(735, 131);
-            this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(90, 15);
-            this.label10.TabIndex = 1;
-            this.label10.Text = "wordcloud aquí";
+            this.formsPlot2.Location = new System.Drawing.Point(609, 3);
+            this.formsPlot2.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.formsPlot2.Name = "formsPlot2";
+            this.formsPlot2.Size = new System.Drawing.Size(342, 272);
+            this.formsPlot2.TabIndex = 1;
             // 
             // tableLayoutPanel1
             // 
@@ -293,7 +318,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(975, 628);
+            this.ClientSize = new System.Drawing.Size(975, 713);
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.panel1);
             this.Name = "Form1";
@@ -301,8 +326,8 @@
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             this.panel2.ResumeLayout(false);
+            this.tableLayoutPanel3.ResumeLayout(false);
             this.tableLayoutPanel2.ResumeLayout(false);
-            this.tableLayoutPanel2.PerformLayout();
             this.flowLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.panel6.ResumeLayout(false);
@@ -339,6 +364,8 @@
         private TableLayoutPanel tableLayoutPanel2;
         private FlowLayoutPanel flowLayoutPanel1;
         private ScottPlot.FormsPlot formsPlot1;
-        private Label label10;
+        private ScottPlot.FormsPlot formsPlot2;
+        private TableLayoutPanel tableLayoutPanel3;
+        private ScottPlot.FormsPlot formsPlot3;
     }
 }
