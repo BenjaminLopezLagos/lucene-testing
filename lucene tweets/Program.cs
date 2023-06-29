@@ -62,8 +62,8 @@ var searcher = new TweetSearcher($@"..\..\..\{indexNameTweets}");
 var vader = new Vader();
 var sentimentDetector = new SentimentDetection(mlnet);
 
-//var query = new BooleanQuery();
-//query.Add(new TermQuery(new Term("content", "elon")), Occur.MUST);
+var query = new BooleanQuery();
+query.Add(new TermQuery(new Term("content", "elon")), Occur.MUST);
 
 // elon offers to buy Twitter at $54.20
 //query.Add(NumericRangeQuery.NewInt64Range(field:"date",min:20220414, max:20220416,true,true), Occur.MUST);
@@ -89,8 +89,71 @@ var sentimentDetector = new SentimentDetection(mlnet);
 //query.Add(NumericRangeQuery.NewInt64Range(field:"date",min:20220712, max:20220714,true,true), Occur.MUST);
 //query.Add(new TermQuery(new Term("content", "twitter")), Occur.MUST);
 
+// Musk challenges former Twitter CEO Parag Agrawal to a public debate about spam accounts
+// and polls followers on whether they believe less than 5% of Twitter’s daily active users are fake.
+//query.Add(NumericRangeQuery.NewInt64Range(field:"date",min:20220806, max:20220810,true,true), Occur.MUST);
+//query.Add(new TermQuery(new Term("content", "twitter")), Occur.MUST);
 
-/*
+// Musk submits a proposal to move forward with the acquisition at the originally
+// agreed-upon price of $44 billion ($54.20 per share) on the condition that Twitter
+// drops its lawsuit. Elon's larger goal is to create X.
+//query.Add(NumericRangeQuery.NewInt64Range(field:"date",min:20221004, max:20221006,true,true), Occur.MUST);
+//query.Add(new TermQuery(new Term("content", "twitter")), Occur.MUST);
+
+// According to a report in The Washington Post, Musk is telling investors he plans
+// to terminate nearly 75% of Twitter’s staff.
+//query.Add(NumericRangeQuery.NewInt64Range(field:"date",min:20221020, max:20221023,true,true), Occur.MUST);
+//query.Add(new TermQuery(new Term("content", "twitter")), Occur.MUST);
+//query.Add(new TermQuery(new Term("content", "crypto")), Occur.MUST_NOT);
+//query.Add(new TermQuery(new Term("content", "doge")), Occur.MUST_NOT);
+
+// Elon enters twitter with a sink.
+// Then closes deal with twitter.
+// to terminate nearly 75% of Twitter’s staff.
+//query.Add(NumericRangeQuery.NewInt64Range(field:"date",min:20221026, max:20221029,true,true), Occur.MUST);
+//query.Add(new TermQuery(new Term("content", "twitter")), Occur.MUST);
+//query.Add(new TermQuery(new Term("content", "crypto")), Occur.MUST_NOT);
+//query.Add(new TermQuery(new Term("content", "doge")), Occur.MUST_NOT);
+
+// Elon plans to add a new verification system.
+// Then confirms that it will cost 8 bucks.
+//query.Add(NumericRangeQuery.NewInt64Range(field:"date",min:20221030, max:20221103,true,true), Occur.MUST);
+//query.Add(new TermQuery(new Term("content", "twitter")), Occur.MUST);
+//query.Add(new TermQuery(new Term("content", "crypto")), Occur.MUST_NOT);
+//query.Add(new TermQuery(new Term("content", "doge")), Occur.MUST_NOT);
+
+// Elon fires half of his staff.
+// He did it in order to cut costs due to massive drop in revenue.
+//query.Add(NumericRangeQuery.NewInt64Range(field:"date",min:20221104, max:20221108,true,true), Occur.MUST);
+//query.Add(new TermQuery(new Term("content", "twitter")), Occur.MUST);
+//query.Add(new TermQuery(new Term("content", "crypto")), Occur.MUST_NOT);
+//query.Add(new TermQuery(new Term("content", "doge")), Occur.MUST_NOT);
+
+// Twitter BLUE BEGINS.
+// ... and then people start impersonating brands.
+// During this time, elon talks about possible bankruptcy.
+//query.Add(NumericRangeQuery.NewInt64Range(field:"date",min:20221109, max:20221112,true,true), Occur.MUST);
+//query.Add(new TermQuery(new Term("content", "twitter")), Occur.MUST);
+//query.Add(new TermQuery(new Term("content", "crypto")), Occur.MUST_NOT);
+//query.Add(new TermQuery(new Term("content", "doge")), Occur.MUST_NOT);
+
+// Musk fires more twitter staff; supossedly 80%.
+// Might delete this one later (((( REMINDER )))).
+//query.Add(NumericRangeQuery.NewInt64Range(field:"date",min:20221112, max:20221114,true,true), Occur.MUST);
+//query.Add(new TermQuery(new Term("content", "twitter")), Occur.MUST);
+//query.Add(new TermQuery(new Term("content", "staff")), Occur.SHOULD);
+//query.Add(new FuzzyQuery(new Term("content", "employee")), Occur.SHOULD);
+//query.Add(new TermQuery(new Term("content", "crypto")), Occur.MUST_NOT);
+//query.Add(new TermQuery(new Term("content", "doge")), Occur.MUST_NOT);
+
+// Musk send an ultimatum to staff, asking to work long hours or leave.
+//query.Add(NumericRangeQuery.NewInt64Range(field:"date",min:20221116, max:20221118,true,true), Occur.MUST);
+//query.Add(new TermQuery(new Term("content", "twitter")), Occur.MUST);
+//query.Add(new TermQuery(new Term("content", "staff")), Occur.SHOULD);
+
+// NOW ADDING TWITTER API STUFF
+
+
 // TERMS TO ALWAYS AVOID
 query.Add(new TermQuery(new Term("user", "ElonAnnounces")), Occur.MUST_NOT);
 query.Add(new FuzzyQuery(new Term("content", "Breaking")), Occur.MUST_NOT);
@@ -103,6 +166,7 @@ query.Add(new TermQuery(new Term("content", "LATEST:")), Occur.MUST_NOT);
 query.Add(new TermQuery(new Term("user", "DefiCinema")), Occur.MUST_NOT);
 query.Add(new TermQuery(new Term("user", "movierecite")), Occur.MUST_NOT);
 query.Add(new TermQuery(new Term("user", "kosmatos")), Occur.MUST_NOT);
+query.Add(new TermQuery(new Term("user", "africansinnews")), Occur.MUST_NOT);
 query.Add(new TermQuery(new Term("user", "SobhitSinha")), Occur.MUST_NOT);
 query.Add(new TermQuery(new Term("user", "CryptonewZi")), Occur.MUST_NOT);
 query.Add(new TermQuery(new Term("user", "StockandmoreCom")), Occur.MUST_NOT);
@@ -127,7 +191,15 @@ query.Add(new FuzzyQuery(new Term("user", "cgtnafrica"),  2, 2), Occur.MUST_NOT)
 query.Add(new FuzzyQuery(new Term("user", "Taipan57602002"),  2, 2), Occur.MUST_NOT);
 query.Add(new TermQuery(new Term("user", "CoinDiscoveryy")), Occur.MUST_NOT);
 query.Add(new TermQuery(new Term("user", "Claire__James")), Occur.MUST_NOT);
-*/
+query.Add(new TermQuery(new Term("content", "@realDailyWire")), Occur.MUST_NOT);
+query.Add(new TermQuery(new Term("user", "StockMKTNewz")), Occur.MUST_NOT);
+query.Add(new TermQuery(new Term("user", "W3B_news")), Occur.MUST_NOT);
+query.Add(new TermQuery(new Term("content", "SCOOP")), Occur.MUST_NOT);
+query.Add(new TermQuery(new Term("user", "0xthefutureis")), Occur.MUST_NOT);
+query.Add(new TermQuery(new Term("user", "delete75522330")), Occur.MUST_NOT);
+query.Add(new TermQuery(new Term("content", "bloomberg")), Occur.MUST_NOT);
+query.Add(new TermQuery(new Term("content", "Cryptocurrency Price")), Occur.MUST_NOT);
+query.Add(new TermQuery(new Term("user", "EmpiricalNooz")), Occur.MUST_NOT);
 
 /*
 query.Add(new TermQuery(new Term("content", "twitter")), Occur.MUST);
@@ -153,8 +225,8 @@ query.Add(new TermQuery(new Term("content", "gHacks Tech News ")), Occur.MUST_NO
 //query.Add(NumericRangeQuery.NewInt32Range(field:"views",min:0, max:100,true,true), Occur.MUST);
 //query.Add(new WildcardQuery(new Term("content", "c*m")), Occur.MUST);
 
-var query = new MatchAllDocsQuery();
-var resultDocs = searcher.CustomQuery(query, numberOfResults: 1000);
+//var query = new MatchAllDocsQuery();
+var resultDocs = searcher.CustomQuery(query, numberOfResults: 1);
 //TweetSearcher.PrintResults(resultDocs);
 /*
 var termFreqDf = new DataFrame(columns: new DataFrameColumn[]
@@ -186,7 +258,7 @@ if (resultDocs != null)
     //classifiedTweetsIndexer.DeleteCurrentIndex();
     //sentimentDetector.ExecuteDetector(resultDocs, classifiedTweetsIndexer);
     var classifiedTweetsSearcher = new TweetSearcher($@"..\..\..\{classifiedTweetsPath}");
-    var newResults = classifiedTweetsSearcher.CustomQuery(query);
+    var newResults = classifiedTweetsSearcher.CustomQuery(query, 5000);
     newResults = newResults.OrderByDescending(x => x.Get("date")).ToList();
     newResults.ToList().ForEach(x => Console.WriteLine($"{x.Get("user")}" + "\n" +
                                                        $"{x.Get("content")}" + "\n" +
