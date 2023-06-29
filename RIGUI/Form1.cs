@@ -29,9 +29,6 @@ namespace RIGUI
             formsPlot2.Plot.Style(Style.Blue1);
             formsPlot2.Refresh();
 
-            formsPlot3.Plot.Style(Style.Blue1);
-            formsPlot3.Refresh();
-
             Task.Run(LoadResults);
         }
         private async Task LoadResults()
