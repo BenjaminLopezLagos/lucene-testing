@@ -7,6 +7,12 @@ using System.Text;
 using CsvHelper;
 using CsvHelper.Configuration;
 using BERTTokenizers;
+using KnowledgePicker.WordCloud;
+using KnowledgePicker.WordCloud.Coloring;
+using KnowledgePicker.WordCloud.Drawing;
+using KnowledgePicker.WordCloud.Layouts;
+using KnowledgePicker.WordCloud.Primitives;
+using KnowledgePicker.WordCloud.Sizers;
 using Lucene.Net.Util;
 using Microsoft.Data.Analysis;
 using lucene_tweets;
@@ -27,6 +33,7 @@ using Microsoft.ML.OnnxRuntime.Tensors;
 using Microsoft.ML.TorchSharp.NasBert;
 using LuceneDirectory = Lucene.Net.Store.Directory;
 using Lucene.Net.Documents;
+using SkiaSharp;
 
 var mlnet = new MlNetModel($@"..\..\..\DetectionModels\model.zip");
 var testInput = new SentimentInput()
@@ -66,7 +73,7 @@ var query = new BooleanQuery();
 query.Add(new TermQuery(new Term("content", "elon")), Occur.MUST);
 
 // elon offers to buy Twitter at $54.20
-//query.Add(NumericRangeQuery.NewInt64Range(field:"date",min:20220414, max:20220416,true,true), Occur.MUST);
+query.Add(NumericRangeQuery.NewInt64Range(field:"date",min:20220414, max:20220416,true,true), Occur.MUST);
 
 // The social media platform accepts Musk's offer and announces the deal valuation at $44 billion.
 //query.Add(NumericRangeQuery.NewInt64Range(field:"date",min:20220425, max:20220427,true,true), Occur.MUST);
@@ -264,6 +271,37 @@ if (resultDocs != null)
                                                        $"{x.Get("content")}" + "\n" +
                                                        $"{DateTools.StringToDate(x.Get("date")).ToShortDateString()}" + "\n" +
                                                        $"{x.Get("mloutput")}"));
+    Console.WriteLine("tf start...");
+    var tf = TermFrequency.GetTermFrequency(newResults)
+        .Take(200).ToDictionary(x => x.Key, x => x.Value);
+    const int k = 4; // scale
+    var wordCloud = new WordCloudInput(
+        tf.Select(p => new WordCloudEntry(p.Key, p.Value)))
+    {
+        Width = 1024 * k,
+        Height = 256 * k,
+        MinFontSize = 8 * k,
+        MaxFontSize = 32 * k
+    };
+    var sizer = new LogSizer(wordCloud);
+    using var engine = new SkGraphicEngine(sizer, wordCloud);
+    var layout = new SpiralLayout(wordCloud);
+    var colorizer = new RandomColorizer(); // optional
+    var wcg = new WordCloudGenerator<SKBitmap>(wordCloud, engine, layout, colorizer);
+
+    // Draw the bitmap on white background.
+    using var final = new SKBitmap(wordCloud.Width, wordCloud.Height);
+    using var canvas = new SKCanvas(final);
+    canvas.Clear(SKColors.White);
+    using var bitmap = wcg.Draw();
+    canvas.DrawBitmap(bitmap, 0, 0);
+
+    // Save to PNG.
+    using var data = final.Encode(SKEncodedImageFormat.Png, 100);
+    using var writer = File.Create(@"..\..\..\output.png");
+    data.SaveTo(writer);
+
+    Console.WriteLine("tf done");
 
     /*
     resultDocs.ToList().ForEach(x => tweets.Add(new Tweet(x)));
