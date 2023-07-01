@@ -273,8 +273,8 @@ if (resultDocs != null)
                                                        $"{x.Get("mloutput")}"));
     Console.WriteLine("tf start...");
     var tf = TermFrequency.GetTermFrequency(newResults)
-        .Take(200).ToDictionary(x => x.Key, x => x.Value);
-    const int k = 4; // scale
+        .Take(300).ToDictionary(x => x.Key, x => x.Value);
+    const int k = 2; // scale
     var wordCloud = new WordCloudInput(
         tf.Select(p => new WordCloudEntry(p.Key, p.Value)))
     {

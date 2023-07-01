@@ -1,4 +1,10 @@
 using System.Security;
+using KnowledgePicker.WordCloud;
+using KnowledgePicker.WordCloud.Coloring;
+using KnowledgePicker.WordCloud.Drawing;
+using KnowledgePicker.WordCloud.Layouts;
+using KnowledgePicker.WordCloud.Primitives;
+using KnowledgePicker.WordCloud.Sizers;
 using lucene_tweets;
 using lucene_tweets.DetectionModels;
 using Lucene.Net.Documents;
@@ -6,6 +12,8 @@ using Lucene.Net.Search;
 using Lucene.Net.Util;
 using static Lucene.Net.Queries.Function.ValueSources.MultiFunction;
 using ScottPlot;
+using SkiaSharp;
+using SkiaSharp.Views.Desktop;
 
 namespace RIGUI
 {
@@ -48,6 +56,8 @@ namespace RIGUI
                 {
                     Task.Run(GenerateOverallPolarity),
                     Task.Run(GeneratePlot_PolarityChanges),
+                    Task.Run(GenerateWordCloud_PositiveTweets),
+                    Task.Run(GenerateWordCloud_NegativeTweets),
                 };
                 Task.WaitAll(tasks);
                 label1.Text = "DASHBOARD";
@@ -148,6 +158,87 @@ namespace RIGUI
             }
         }
         */
+
+        private async Task GenerateWordCloud_PositiveTweets()
+        {
+            await Task.Run(() =>
+            {
+                if (_tweets != null)
+                {
+                    var positiveDocs = _tweets.Where(x => double.Parse(x.Get("mloutput")) > 0.5);
+                    var tf = TermFrequency.GetTermFrequency(positiveDocs)
+                        .Take(300).ToDictionary(x => x.Key, x => x.Value);
+                    const int k = 2; // scale
+                    var wordCloud = new WordCloudInput(
+                        tf.Select(p => new WordCloudEntry(p.Key, p.Value)))
+                    {
+                        Width = 1024 * k,
+                        Height = 256 * k,
+                        MinFontSize = 8 * k,
+                        MaxFontSize = 32 * k
+                    };
+                    var sizer = new LogSizer(wordCloud);
+                    using var engine = new SkGraphicEngine(sizer, wordCloud);
+                    var layout = new SpiralLayout(wordCloud);
+                    var colorizer = new RandomColorizer(); // optional
+                    var wcg = new WordCloudGenerator<SKBitmap>(wordCloud, engine, layout, colorizer);
+
+                    // Draw the bitmap on white background.
+                    using var final = new SKBitmap(wordCloud.Width, wordCloud.Height);
+                    using var canvas = new SKCanvas(final);
+                    canvas.Clear(SKColors.White);
+                    using var bitmap = wcg.Draw();
+                    canvas.DrawBitmap(bitmap, 0, 0);
+
+                    // Save to PNG.
+                    using var data = final.Encode(SKEncodedImageFormat.Png, 100);
+                    using var writer = File.Create(@"..\..\..\output_pos.png");
+                    data.SaveTo(writer);
+                    pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
+                    pictureBox1.Image = final.ToBitmap();
+                }
+            });
+        }
+        private async Task GenerateWordCloud_NegativeTweets()
+        {
+            await Task.Run(() =>
+            {
+                if (_tweets != null)
+                {
+                    var positiveDocs = _tweets.Where(x => double.Parse(x.Get("mloutput")) < 0.5);
+                    var tf = TermFrequency.GetTermFrequency(positiveDocs)
+                        .Take(300).ToDictionary(x => x.Key, x => x.Value);
+                    const int k = 2; // scale
+                    var wordCloud = new WordCloudInput(
+                        tf.Select(p => new WordCloudEntry(p.Key, p.Value)))
+                    {
+                        Width = 1024 * k,
+                        Height = 256 * k,
+                        MinFontSize = 8 * k,
+                        MaxFontSize = 32 * k
+                    };
+                    var sizer = new LogSizer(wordCloud);
+                    using var engine = new SkGraphicEngine(sizer, wordCloud);
+                    var layout = new SpiralLayout(wordCloud);
+                    var colorizer = new RandomColorizer(); // optional
+                    var wcg = new WordCloudGenerator<SKBitmap>(wordCloud, engine, layout, colorizer);
+
+                    // Draw the bitmap on white background.
+                    using var final = new SKBitmap(wordCloud.Width, wordCloud.Height);
+                    using var canvas = new SKCanvas(final);
+                    canvas.Clear(SKColors.White);
+                    using var bitmap = wcg.Draw();
+                    canvas.DrawBitmap(bitmap, 0, 0);
+
+                    // Save to PNG.
+                    using var data = final.Encode(SKEncodedImageFormat.Png, 100);
+                    using var writer = File.Create(@"..\..\..\output_neg.png");
+                    data.SaveTo(writer);
+                    pictureBox2.SizeMode = PictureBoxSizeMode.Zoom;
+                    pictureBox2.Image = final.ToBitmap();
+                }
+            });
+        }
 
         private void label9_Click(object sender, EventArgs e)
         {

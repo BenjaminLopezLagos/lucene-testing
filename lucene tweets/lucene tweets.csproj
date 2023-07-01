@@ -28,6 +28,7 @@
     <PackageReference Include="Microsoft.ML" Version="3.0.0-preview.23266.6" />
     <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.15.1" />
     <PackageReference Include="Microsoft.ML.TorchSharp" Version="0.21.0-preview.23266.6" />
+    <PackageReference Include="SkiaSharp.Views" Version="2.88.4-preview.84" />
     <PackageReference Include="TorchSharp-cpu" Version="0.100.3" />
     <PackageReference Include="VaderSharp2" Version="3.3.2.1" />
   </ItemGroup>
