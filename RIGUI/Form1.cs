@@ -25,9 +25,10 @@ namespace RIGUI
         private int _positiveTweetsAmount = 0;
         private int _negativeTweetsAmount = 0;
 
-        public Form1()
+        public Form1(IList<Lucene.Net.Documents.Document> docs)
         {
             InitializeComponent();
+            _tweets = docs;
             label1.Text = "Loading dashboard...";
             label4.Text = "Unavailable";
             label6.Text = "Unavailable";
@@ -37,16 +38,18 @@ namespace RIGUI
             formsPlot2.Plot.Style(Style.Blue1);
             formsPlot2.Refresh();
 
-            Task.Run(LoadResults);
+            //Task.Run(LoadResults);
         }
-        private async Task LoadResults()
+        public async Task LoadResults()
         {
+            /*
             var mlnet = new MlNetModel(@"..\..\..\..\lucene tweets\DetectionModels\model.zip");
             var sentimentDetector = new SentimentDetection(mlnet);
             var indexPath = @"..\..\..\..\lucene tweets\ClassifiedTweetsIndex";
             var searcher = new TweetSearcher(indexPath);
             var query = new MatchAllDocsQuery();
             _tweets = searcher.CustomQuery(query, numberOfResults: 30000);
+            */
             if (_tweets != null)
             {
                 _tweets = _tweets.OrderBy(o=>o.Get("date")).ToList();
@@ -173,9 +176,9 @@ namespace RIGUI
                         tf.Select(p => new WordCloudEntry(p.Key, p.Value)))
                     {
                         Width = 1024 * k,
-                        Height = 256 * k,
-                        MinFontSize = 8 * k,
-                        MaxFontSize = 32 * k
+                        Height = 512 * k,
+                        MinFontSize = 12 * k,
+                        MaxFontSize = 64 * k
                     };
                     var sizer = new LogSizer(wordCloud);
                     using var engine = new SkGraphicEngine(sizer, wordCloud);
@@ -213,9 +216,9 @@ namespace RIGUI
                         tf.Select(p => new WordCloudEntry(p.Key, p.Value)))
                     {
                         Width = 1024 * k,
-                        Height = 256 * k,
-                        MinFontSize = 8 * k,
-                        MaxFontSize = 32 * k
+                        Height = 512 * k,
+                        MinFontSize = 12 * k,
+                        MaxFontSize = 64 * k
                     };
                     var sizer = new LogSizer(wordCloud);
                     using var engine = new SkGraphicEngine(sizer, wordCloud);
