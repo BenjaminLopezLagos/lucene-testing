@@ -32,6 +32,8 @@
             this.label1 = new System.Windows.Forms.Label();
             this.panel2 = new System.Windows.Forms.Panel();
             this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.pictureBox2 = new System.Windows.Forms.PictureBox();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
             this.formsPlot1 = new ScottPlot.FormsPlot();
@@ -49,11 +51,11 @@
             this.panel3 = new System.Windows.Forms.Panel();
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.pictureBox2 = new System.Windows.Forms.PictureBox();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             this.tableLayoutPanel2.SuspendLayout();
             this.flowLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
@@ -61,8 +63,6 @@
             this.panel5.SuspendLayout();
             this.panel4.SuspendLayout();
             this.panel3.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             this.SuspendLayout();
             // 
             // panel1
@@ -109,13 +109,31 @@
             this.tableLayoutPanel3.Controls.Add(this.pictureBox1, 0, 0);
             this.tableLayoutPanel3.Controls.Add(this.pictureBox2, 1, 0);
             this.tableLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel3.Location = new System.Drawing.Point(10, 400);
+            this.tableLayoutPanel3.Location = new System.Drawing.Point(10, 468);
             this.tableLayoutPanel3.Margin = new System.Windows.Forms.Padding(0);
             this.tableLayoutPanel3.Name = "tableLayoutPanel3";
             this.tableLayoutPanel3.RowCount = 1;
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel3.Size = new System.Drawing.Size(955, 269);
+            this.tableLayoutPanel3.Size = new System.Drawing.Size(955, 201);
             this.tableLayoutPanel3.TabIndex = 2;
+            // 
+            // pictureBox1
+            // 
+            this.pictureBox1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pictureBox1.Location = new System.Drawing.Point(3, 3);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(471, 195);
+            this.pictureBox1.TabIndex = 0;
+            this.pictureBox1.TabStop = false;
+            // 
+            // pictureBox2
+            // 
+            this.pictureBox2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pictureBox2.Location = new System.Drawing.Point(480, 3);
+            this.pictureBox2.Name = "pictureBox2";
+            this.pictureBox2.Size = new System.Drawing.Size(472, 195);
+            this.pictureBox2.TabIndex = 1;
+            this.pictureBox2.TabStop = false;
             // 
             // tableLayoutPanel2
             // 
@@ -125,7 +143,7 @@
             this.tableLayoutPanel2.Controls.Add(this.flowLayoutPanel1, 0, 0);
             this.tableLayoutPanel2.Controls.Add(this.formsPlot2, 1, 0);
             this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Top;
-            this.tableLayoutPanel2.Location = new System.Drawing.Point(10, 122);
+            this.tableLayoutPanel2.Location = new System.Drawing.Point(10, 190);
             this.tableLayoutPanel2.Name = "tableLayoutPanel2";
             this.tableLayoutPanel2.RowCount = 1;
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
@@ -174,7 +192,7 @@
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 1;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(955, 112);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(955, 180);
             this.tableLayoutPanel1.TabIndex = 0;
             // 
             // panel6
@@ -186,19 +204,19 @@
             this.panel6.Location = new System.Drawing.Point(714, 0);
             this.panel6.Margin = new System.Windows.Forms.Padding(0, 0, 0, 10);
             this.panel6.Name = "panel6";
-            this.panel6.Size = new System.Drawing.Size(241, 102);
+            this.panel6.Size = new System.Drawing.Size(241, 170);
             this.panel6.TabIndex = 3;
             // 
             // label8
             // 
             this.label8.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.label8.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.label8.Location = new System.Drawing.Point(82, 54);
+            this.label8.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.label8.Location = new System.Drawing.Point(3, 28);
             this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(160, 24);
+            this.label8.Size = new System.Drawing.Size(238, 142);
             this.label8.TabIndex = 1;
             this.label8.Text = "elon says lmao";
-            this.label8.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.label8.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // label9
             // 
@@ -220,16 +238,16 @@
             this.panel5.Location = new System.Drawing.Point(476, 0);
             this.panel5.Margin = new System.Windows.Forms.Padding(0, 0, 10, 10);
             this.panel5.Name = "panel5";
-            this.panel5.Size = new System.Drawing.Size(228, 102);
+            this.panel5.Size = new System.Drawing.Size(228, 170);
             this.panel5.TabIndex = 2;
             // 
             // label6
             // 
             this.label6.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 20.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.label6.Location = new System.Drawing.Point(68, 54);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(159, 24);
+            this.label6.Size = new System.Drawing.Size(159, 61);
             this.label6.TabIndex = 1;
             this.label6.Text = "123";
             this.label6.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -253,16 +271,16 @@
             this.panel4.Location = new System.Drawing.Point(238, 0);
             this.panel4.Margin = new System.Windows.Forms.Padding(0, 0, 10, 10);
             this.panel4.Name = "panel4";
-            this.panel4.Size = new System.Drawing.Size(228, 102);
+            this.panel4.Size = new System.Drawing.Size(228, 170);
             this.panel4.TabIndex = 1;
             // 
             // label4
             // 
             this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 20.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.label4.Location = new System.Drawing.Point(68, 54);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(162, 24);
+            this.label4.Size = new System.Drawing.Size(162, 61);
             this.label4.TabIndex = 1;
             this.label4.Text = "123";
             this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -286,16 +304,16 @@
             this.panel3.Location = new System.Drawing.Point(0, 0);
             this.panel3.Margin = new System.Windows.Forms.Padding(0, 0, 10, 10);
             this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(228, 102);
+            this.panel3.Size = new System.Drawing.Size(228, 170);
             this.panel3.TabIndex = 0;
             // 
             // label3
             // 
             this.label3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 20.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.label3.Location = new System.Drawing.Point(68, 54);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(159, 24);
+            this.label3.Size = new System.Drawing.Size(159, 61);
             this.label3.TabIndex = 1;
             this.label3.Text = "123";
             this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -310,24 +328,6 @@
             this.label2.TabIndex = 0;
             this.label2.Text = "Amount of Tweets";
             // 
-            // pictureBox1
-            // 
-            this.pictureBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pictureBox1.Location = new System.Drawing.Point(3, 3);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(471, 263);
-            this.pictureBox1.TabIndex = 0;
-            this.pictureBox1.TabStop = false;
-            // 
-            // pictureBox2
-            // 
-            this.pictureBox2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pictureBox2.Location = new System.Drawing.Point(480, 3);
-            this.pictureBox2.Name = "pictureBox2";
-            this.pictureBox2.Size = new System.Drawing.Size(472, 263);
-            this.pictureBox2.TabIndex = 1;
-            this.pictureBox2.TabStop = false;
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -341,6 +341,8 @@
             this.panel1.PerformLayout();
             this.panel2.ResumeLayout(false);
             this.tableLayoutPanel3.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
             this.tableLayoutPanel2.ResumeLayout(false);
             this.flowLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.ResumeLayout(false);
@@ -352,8 +354,6 @@
             this.panel4.PerformLayout();
             this.panel3.ResumeLayout(false);
             this.panel3.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -366,7 +366,6 @@
         private Panel panel2;
         private TableLayoutPanel tableLayoutPanel1;
         private Panel panel6;
-        private Label label8;
         private Label label9;
         private Panel panel5;
         private Label label6;
@@ -384,5 +383,6 @@
         private TableLayoutPanel tableLayoutPanel3;
         private PictureBox pictureBox1;
         private PictureBox pictureBox2;
+        public Label label8;
     }
 }

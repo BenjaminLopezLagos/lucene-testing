@@ -48,9 +48,14 @@
             this.label1 = new System.Windows.Forms.Label();
             this.panelTweets = new System.Windows.Forms.Panel();
             this.btnDashboard = new System.Windows.Forms.Button();
+            this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            this.UserCol = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ContentCol = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.DateCol = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.panelMenu.SuspendLayout();
             this.panelTitle.SuspendLayout();
             this.panelTweets.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
             // panelMenu
@@ -329,6 +334,7 @@
             // panelTweets
             // 
             this.panelTweets.AutoSize = true;
+            this.panelTweets.Controls.Add(this.dataGridView1);
             this.panelTweets.Controls.Add(this.btnDashboard);
             this.panelTweets.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panelTweets.Location = new System.Drawing.Point(220, 0);
@@ -349,6 +355,39 @@
             this.btnDashboard.UseVisualStyleBackColor = true;
             this.btnDashboard.Click += new System.EventHandler(this.btnDashboard_Click);
             // 
+            // dataGridView1
+            // 
+            this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.UserCol,
+            this.ContentCol,
+            this.DateCol});
+            this.dataGridView1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dataGridView1.Location = new System.Drawing.Point(0, 0);
+            this.dataGridView1.Name = "dataGridView1";
+            this.dataGridView1.RowTemplate.Height = 25;
+            this.dataGridView1.Size = new System.Drawing.Size(543, 455);
+            this.dataGridView1.TabIndex = 1;
+            this.dataGridView1.Visible = false;
+            // 
+            // UserCol
+            // 
+            this.UserCol.HeaderText = "User";
+            this.UserCol.Name = "UserCol";
+            this.UserCol.ReadOnly = true;
+            // 
+            // ContentCol
+            // 
+            this.ContentCol.HeaderText = "Content";
+            this.ContentCol.Name = "ContentCol";
+            this.ContentCol.ReadOnly = true;
+            // 
+            // DateCol
+            // 
+            this.DateCol.HeaderText = "Date";
+            this.DateCol.Name = "DateCol";
+            this.DateCol.ReadOnly = true;
+            // 
             // MainMenu
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -362,6 +401,7 @@
             this.panelTitle.ResumeLayout(false);
             this.panelTitle.PerformLayout();
             this.panelTweets.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -389,5 +429,9 @@
         private Button btnEvent14;
         private Panel panelTweets;
         private Button btnDashboard;
+        private DataGridView dataGridView1;
+        private DataGridViewTextBoxColumn UserCol;
+        private DataGridViewTextBoxColumn ContentCol;
+        private DataGridViewTextBoxColumn DateCol;
     }
 }
