@@ -29,16 +29,16 @@ namespace RIGUI
             if(_tweets != null)
             {
                 var dashboardForm = new Form1(_tweets);
-                dashboardForm.ShowDialog();
                 await Task.Run(dashboardForm.LoadResults);
-            }
+                dashboardForm.ShowDialog();
+            } 
         }
 
         private void LoadTweets()
         {
             if (_query != null)
             {
-                _tweets = _tweetSearcher.CustomQuery(_query, numberOfResults: 30000);
+                _tweets = _tweetSearcher.CustomQuery(_query, numberOfResults: 300000);
             }
         }
 
@@ -47,7 +47,7 @@ namespace RIGUI
             _query = new BooleanQuery();
             // elon offers to buy Twitter at $54.20
             _query.Add(new TermQuery(new Term("content", "elon")), Occur.MUST);
-            _query.Add(NumericRangeQuery.NewInt64Range(field: "date", min: 20220414, max: 20220416, true, true), Occur.MUST);
+            _query.Add(NumericRangeQuery.NewInt64Range(field: "date", min: 20220414, max: 20220424, true, true), Occur.MUST);
         }
 
         private void btnEvent2_Click(object sender, EventArgs e)
@@ -78,6 +78,10 @@ namespace RIGUI
 
         private void btnEvent5_Click(object sender, EventArgs e)
         {
+            _query = new BooleanQuery();
+            // test
+            _query.Add(new TermQuery(new Term("content", "elon")), Occur.MUST);
+            _query.Add(NumericRangeQuery.NewInt64Range(field: "date", min: 20220526, max: 20230529, true, true), Occur.MUST);
 
         }
 

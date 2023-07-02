@@ -176,9 +176,9 @@ namespace RIGUI
                         tf.Select(p => new WordCloudEntry(p.Key, p.Value)))
                     {
                         Width = 1024 * k,
-                        Height = 256 * k,
-                        MinFontSize = 8 * k,
-                        MaxFontSize = 32 * k
+                        Height = 512 * k,
+                        MinFontSize = 12 * k,
+                        MaxFontSize = 64 * k
                     };
                     var sizer = new LogSizer(wordCloud);
                     using var engine = new SkGraphicEngine(sizer, wordCloud);
@@ -216,9 +216,9 @@ namespace RIGUI
                         tf.Select(p => new WordCloudEntry(p.Key, p.Value)))
                     {
                         Width = 1024 * k,
-                        Height = 256 * k,
-                        MinFontSize = 8 * k,
-                        MaxFontSize = 32 * k
+                        Height = 512 * k,
+                        MinFontSize = 12 * k,
+                        MaxFontSize = 64 * k
                     };
                     var sizer = new LogSizer(wordCloud);
                     using var engine = new SkGraphicEngine(sizer, wordCloud);
